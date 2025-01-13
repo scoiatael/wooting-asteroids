@@ -43,7 +43,7 @@ $ git clone https://github.com/bhauman/flappy-bird-demo-new.git
 Change into the flappy-bird-demo-new directory and run:
 
 ```shell
-$ clj -A:build
+$ clj -M:build
 ```
 
 ## License
