@@ -13,7 +13,7 @@
   :resource-paths ["resources" "target"]
   
   :clean-targets ^{:protect false} ["target/public"]
-  
+
   :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.2.20"]
                                   [com.bhauman/rebel-readline-cljs "0.1.4"]
                                   [org.slf4j/slf4j-nop "2.0.3"]]}}
