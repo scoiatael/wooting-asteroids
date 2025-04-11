@@ -34,6 +34,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - uses: DeterminateSystems/nix-installer-action@main
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/project.clj') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - run: nix-shell -p leiningen --run "lein build"
       - run: cp -r resources/public/* target/public/
         # Adjust build paths for Github Pages
