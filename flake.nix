@@ -4,6 +4,7 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
+  # TODO: https://flake.parts/getting-started.html
   outputs = { nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
