@@ -8,7 +8,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        lein = pkgs.leiningen.override { jdk = pkgs.jdk21_headless; };
+        lein = pkgs.leiningen.override { jdk = pkgs.zulu21; };
       in {
         packages.default = lein;
         devShells.default = pkgs.mkShellNoCC { packages = [ lein ]; };
