@@ -74,15 +74,23 @@ body {
 .analog {
   position: absolute;
   text-align: center;
-  height: 1em;
-  background-color: red;
+  width: 300px;
   left: 90px;
   font-size: 18;
   top: 0px;
   color: #fff;
-  text-shadow: -4px 0 black, 0 4px black, 4px 0 black, 0 -4px black;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
   z-index: 5;
   font-family: monospace;
+}
+
+.analog-text {
+  margin: 0px;
+}
+
+.analog-value {
+  background-color: #9cb0ecdd;
+  height: 1em;
 }
 
 .start-button {

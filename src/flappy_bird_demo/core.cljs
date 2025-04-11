@@ -2,6 +2,8 @@
   (:require
    [cljsjs.react]
    [cljsjs.react.dom]
+   [goog.string.format]
+   [goog.string :as gstring]
    [sablono.core :as sab :include-macros true]))
 
 (defn floor [x] (.floor js/Math x))
@@ -21,6 +23,7 @@
 (def pillar-gap 158) ;; 158
 (def pillar-width 86)
 (def max-analog-width 300)
+(def analog-jump-vel 10)
 
 (defonce ^:private root (.createRoot js/ReactDOM (.getElementById js/document "board-area")))
 
@@ -133,7 +136,7 @@
                                  :jump-count (inc jump-count)
                                  :flappy-start-time cur-time
                                  :last-value value
-                                 :initial-vel (max  (* value jump-vel) cur-vel)))))
+                                 :initial-vel (+  (* value analog-jump-vel) cur-vel)))))
 
 ;; derivatives
 
@@ -158,9 +161,9 @@
 
 (defn px [n] (str n "px"))
 
-(defn pillar [{:keys [cur-x pos-x upper-height lower-height]}]
+(defn pillar [{:keys [start-time cur-x pos-x upper-height lower-height]}]
   (sab/html
-   [:div.pillars {:key pos-x}
+   [:div.pillars {:key (str pos-x start-time)}
     [:div.pillar.pillar-upper {:style {:left (px cur-x)
                                        :height upper-height}}]
     [:div.pillar.pillar-lower {:style {:left (px cur-x)
@@ -177,13 +180,14 @@
   (.then (.getDevices js/analogsense)
          (fn [devices] (if-let [device (first devices)]
                          (do
-                           (.log js/console "Listetning for events of " (.getProductName device))
+                           (.log js/console "Listening for events of " (.getProductName device))
                            (.startListening device (fn [active_keys]
                                                      (if-let [{:keys [scancode value]} (js->clj (first active_keys) :keywordize-keys true)]
                                                        (let [key (.scancodeToString js/analogsense scancode)]
                                                          (if (= key "Space")
                                                            (swap! flap-state (jump-analog value))))
-                                                       (swap! flap-state #(assoc % :last-value nil))))))
+                                                       (swap! flap-state #(assoc % :last-value nil))
+                                                       ))))
                          (.error js/console "No analog devices found" devices))))
   (.requestAnimationFrame
    js/window
@@ -198,9 +202,11 @@
                                          (swap! flap-state jump)
                                          (.preventDefault e))}
              [:h1.score score]
-             (if timer-running
-               [:div.analog {:style {:width (* last-value max-analog-width)}}
-                [:h2 last-value]])
+             (if (and timer-running
+                      last-value)
+               [:div.analog
+                [:div.analog-value {:style {:width (* last-value max-analog-width)}}]
+                [:h2.analog-text (gstring/format "%.3f" last-value)]])
              (if-not timer-running
                (sab/html [:a.start-button {:onClick #(start-game)}
                 (if (< 1 jump-count) "RESTART" "START")])
