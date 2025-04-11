@@ -6,9 +6,11 @@
 
   outputs = { nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        lein = pkgs.leiningen.override { jdk = pkgs.jdk21_headless; };
       in {
-        packages.default = pkgs.leiningen;
-        devShells.default = pkgs.mkShellNoCC { packages = [ pkgs.leiningen ]; };
+        packages.default = lein;
+        devShells.default = pkgs.mkShellNoCC { packages = [ lein ]; };
       });
 }
