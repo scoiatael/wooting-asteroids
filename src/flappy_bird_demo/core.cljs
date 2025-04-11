@@ -18,6 +18,7 @@
 (def bottom-y 561)
 (def flappy-x 212)
 (def flappy-width 57)
+(def flappy-roundness 10)
 (def flappy-height 41)
 (def pillar-spacing 324)
 (def pillar-gap 158) ;; 158
@@ -53,11 +54,11 @@
   (translate pos-x horiz-vel (- cur-time start-time)))
 
 (defn in-pillar? [{:keys [cur-x]}]
-  (and (>= (+ flappy-x flappy-width) cur-x)
-       (< flappy-x (+ cur-x pillar-width))))
+  (and (>= (+ flappy-x flappy-width) (+ cur-x flappy-roundness))
+       (< (+ flappy-x flappy-roundness) (+ cur-x pillar-width))))
 
 (defn in-pillar-gap? [{:keys [flappy-y]} {:keys [gap-top]}]
-  (and (< gap-top flappy-y)
+  (and (< gap-top (+ flappy-y flappy-roundness))
        (> (+ gap-top pillar-gap)
           (+ flappy-y flappy-height))))
 
@@ -212,7 +213,8 @@
                                          (swap! flap-state jump)
                                          (.preventDefault e))}
              [:h1.score score]
-             [:h4.debug initial-vel cur-vel]
+             [:h4.debug (gstring/format "%.3f" initial-vel)]
+             [:h4.debug (gstring/format "%.3f" cur-vel)]
              (if (and timer-running
                       last-value)
                [:div.analog
