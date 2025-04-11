@@ -20,10 +20,11 @@
 (def pillar-spacing 324)
 (def pillar-gap 158) ;; 158
 (def pillar-width 86)
+(def max-analog-width 300)
 
 (defonce ^:private root (.createRoot js/ReactDOM (.getElementById js/document "board-area")))
 
-(def starting-state { :timer-running false
+(def starting-state {:timer-running false
                      :jump-count 0
                      :initial-vel 0
                      :start-time 0
@@ -126,12 +127,13 @@
           :flappy-start-time cur-time
           :initial-vel jump-vel)))
 
-(defn jump-analog [value] (fn  [{:keys [cur-time jump-count] :as state}]
+(defn jump-analog [value] (fn  [{:keys [cur-time cur-vel jump-count] :as state}]
                             (-> state
                                 (assoc
                                  :jump-count (inc jump-count)
                                  :flappy-start-time cur-time
-                                 :initial-vel (* value jump-vel)))))
+                                 :last-value value
+                                 :initial-vel (max  (* value jump-vel) cur-vel)))))
 
 ;; derivatives
 
@@ -180,7 +182,8 @@
                                                      (if-let [{:keys [scancode value]} (js->clj (first active_keys) :keywordize-keys true)]
                                                        (let [key (.scancodeToString js/analogsense scancode)]
                                                          (if (= key "Space")
-                                                            (swap! flap-state (jump-analog value))))))))
+                                                           (swap! flap-state (jump-analog value))))
+                                                       (swap! flap-state #(assoc % :last-value nil))))))
                          (.error js/console "No analog devices found" devices))))
   (.requestAnimationFrame
    js/window
@@ -188,13 +191,16 @@
      (reset! flap-state (reset-state @flap-state time))
      (time-loop time))))
 
-(defn main-template [{:keys [score cur-time jump-count
+(defn main-template [{:keys [score last-value cur-time jump-count
                              timer-running border-pos
                              flappy-y pillar-list]}]
   (sab/html [:div.board { :onMouseDown (fn [e]
                                          (swap! flap-state jump)
                                          (.preventDefault e))}
              [:h1.score score]
+             (if timer-running
+               [:div.analog {:style {:width (* last-value max-analog-width)}}
+                [:h2 last-value]])
              (if-not timer-running
                (sab/html [:a.start-button {:onClick #(start-game)}
                 (if (< 1 jump-count) "RESTART" "START")])

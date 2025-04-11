@@ -71,6 +71,20 @@ body {
   font-family: monospace;
 }
 
+.analog {
+  position: absolute;
+  text-align: center;
+  height: 1em;
+  background-color: red;
+  left: 90px;
+  font-size: 18;
+  top: 0px;
+  color: #fff;
+  text-shadow: -4px 0 black, 0 4px black, 4px 0 black, 0 -4px black;
+  z-index: 5;
+  font-family: monospace;
+}
+
 .start-button {
     color: rgb(244,176,36);
     background-color: #fff;
