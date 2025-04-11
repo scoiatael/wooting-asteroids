@@ -174,26 +174,27 @@
     (when (:timer-running new-state)
       (.requestAnimationFrame js/window time-loop))))
 
-
-(defn start-game []
-  ;; https://github.com/AnalogSense/JavaScript-SDK/blob/senpai/demo.html#L40
-  (.then (.getDevices js/analogsense)
-         (fn [devices] (if-let [device (first devices)]
-                         (do
-                           (.log js/console "Listening for events of " (.getProductName device))
-                           (.startListening device (fn [active_keys]
-                                                     (if-let [{:keys [scancode value]} (js->clj (first active_keys) :keywordize-keys true)]
-                                                       (let [key (.scancodeToString js/analogsense scancode)]
-                                                         (if (= key "Space")
-                                                           (swap! flap-state (jump-analog value))))
-                                                       (swap! flap-state #(assoc % :last-value nil))
-                                                       ))))
-                         (.error js/console "No analog devices found" devices))))
+(defn start-with-device [device]
+  (do
+    (.log js/console "Listening for events of " (.getProductName device))
+    (.startListening device (fn [active_keys]
+                              (if-let [{:keys [scancode value]} (js->clj (first active_keys) :keywordize-keys true)]
+                                (let [key (.scancodeToString js/analogsense scancode)]
+                                  (if (= key "Space")
+                                    (swap! flap-state (jump-analog value))))
+                                (swap! flap-state #(assoc % :last-value nil))))))
   (.requestAnimationFrame
    js/window
    (fn [time]
      (reset! flap-state (reset-state @flap-state time))
      (time-loop time))))
+
+(defn start-game []
+  ;; https://github.com/AnalogSense/JavaScript-SDK/blob/senpai/demo.html#L40
+  (.then (.getDevices js/analogsense)
+         (fn [devices] (if-let [device (first devices)]
+                         (start-with-device device)
+                         (.then (.requestDevice js/analogsense) start-with-device)))))
 
 (defn main-template [{:keys [score last-value cur-time jump-count
                              timer-running border-pos
