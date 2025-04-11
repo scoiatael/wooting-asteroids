@@ -27,8 +27,8 @@
                       :start-time 0
                       :flappy-start-time 0
                       :flappy-y   start-y
-                      :pillar-list
-                      [{ :start-time 0
+                      :root  (.createRoot js/ReactDOM (.getElementById js/document "board-area"))
+                      :pillar-list [{ :start-time 0
                          :pos-x 900
                          :cur-x 900
                          :gap-top 200 }]})
@@ -150,7 +150,7 @@
 
 (defn pillar [{:keys [cur-x pos-x upper-height lower-height]}]
   (sab/html
-   [:div.pillars
+   [:div.pillars {:key pos-x}
     [:div.pillar.pillar-upper {:style {:left (px cur-x)
                                        :height upper-height}}]
     [:div.pillar.pillar-lower {:style {:left (px cur-x)
@@ -184,9 +184,8 @@
              [:div.flappy {:style {:top (px flappy-y)}}]
              [:div.scrolling-border {:style { :background-position-x (px border-pos)}}]]))
 
-(let [node (.getElementById js/document "board-area")]
-  (defn renderer [full-state]
-    (.render js/ReactDOM (main-template full-state) node)))
+(defn renderer [full-state]
+  (.render (:root full-state) (main-template full-state)))
 
 (add-watch flap-state :renderer (fn [_ _ _ n]
                                   (renderer (world n))))
