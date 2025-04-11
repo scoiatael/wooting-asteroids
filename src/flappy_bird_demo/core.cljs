@@ -21,17 +21,18 @@
 (def pillar-gap 158) ;; 158
 (def pillar-width 86)
 
+(defonce ^:private root (.createRoot js/ReactDOM (.getElementById js/document "board-area")))
+
 (def starting-state { :timer-running false
-                      :jump-count 0
-                      :initial-vel 0
-                      :start-time 0
-                      :flappy-start-time 0
-                      :flappy-y   start-y
-                      :root  (.createRoot js/ReactDOM (.getElementById js/document "board-area"))
-                      :pillar-list [{ :start-time 0
-                         :pos-x 900
-                         :cur-x 900
-                         :gap-top 200 }]})
+                     :jump-count 0
+                     :initial-vel 0
+                     :start-time 0
+                     :flappy-start-time 0
+                     :flappy-y   start-y
+                     :pillar-list [{ :start-time 0
+                                    :pos-x 900
+                                    :cur-x 900
+                                    :gap-top 200 }]})
 
 (defn reset-state [_ cur-time]
   (-> starting-state
@@ -125,6 +126,13 @@
           :flappy-start-time cur-time
           :initial-vel jump-vel)))
 
+(defn jump-analog [value] (fn  [{:keys [cur-time jump-count] :as state}]
+                            (-> state
+                                (assoc
+                                 :jump-count (inc jump-count)
+                                 :flappy-start-time cur-time
+                                 :initial-vel (* value jump-vel)))))
+
 ;; derivatives
 
 (defn border [{:keys [cur-time] :as state}]
@@ -163,6 +171,17 @@
 
 
 (defn start-game []
+  ;; https://github.com/AnalogSense/JavaScript-SDK/blob/senpai/demo.html#L40
+  (.then (.getDevices js/analogsense)
+         (fn [devices] (if-let [device (first devices)]
+                         (do
+                           (.log js/console "Listetning for events of " (.getProductName device))
+                           (.startListening device (fn [active_keys]
+                                                     (if-let [{:keys [scancode value]} (js->clj (first active_keys) :keywordize-keys true)]
+                                                       (let [key (.scancodeToString js/analogsense scancode)]
+                                                         (if (= key "Space")
+                                                            (swap! flap-state (jump-analog value))))))))
+                         (.error js/console "No analog devices found" devices))))
   (.requestAnimationFrame
    js/window
    (fn [time]
@@ -185,7 +204,7 @@
              [:div.scrolling-border {:style { :background-position-x (px border-pos)}}]]))
 
 (defn renderer [full-state]
-  (.render (:root full-state) (main-template full-state)))
+  (.render root (main-template full-state)))
 
 (add-watch flap-state :renderer (fn [_ _ _ n]
                                   (renderer (world n))))
