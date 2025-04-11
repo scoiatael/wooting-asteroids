@@ -23,13 +23,14 @@
 (def pillar-gap 158) ;; 158
 (def pillar-width 86)
 (def max-analog-width 300)
-(def analog-jump-vel 10)
+(def analog-jump-vel 2)
 
 (defonce ^:private root (.createRoot js/ReactDOM (.getElementById js/document "board-area")))
 
 (def starting-state {:timer-running false
                      :jump-count 0
                      :initial-vel 0
+                     :cur-vel 0
                      :start-time 0
                      :flappy-start-time 0
                      :flappy-y   start-y
@@ -104,7 +105,8 @@
                     (- bottom-y flappy-height)
                     new-y)]
       (assoc st
-        :flappy-y new-y))
+              :cur-vel cur-vel
+             :flappy-y new-y))
     (sine-wave st)))
 
 (defn score [{:keys [cur-time start-time] :as st}]
@@ -130,13 +132,20 @@
           :flappy-start-time cur-time
           :initial-vel jump-vel)))
 
+(defn scale-analog-value [value]
+  ;;  value is between 0 and 1, ~linear
+  ;;  we wanna make it less linear
+  (->> value
+       (.tan js/Math)
+       (* analog-jump-vel)))
+
 (defn jump-analog [value] (fn  [{:keys [cur-time cur-vel jump-count] :as state}]
                             (-> state
                                 (assoc
                                  :jump-count (inc jump-count)
                                  :flappy-start-time cur-time
                                  :last-value value
-                                 :initial-vel (+  (* value analog-jump-vel) cur-vel)))))
+                                 :initial-vel (+  (scale-analog-value value) (max 0 cur-vel))))))
 
 ;; derivatives
 
@@ -197,12 +206,13 @@
                          (.then (.requestDevice js/analogsense) start-with-device)))))
 
 (defn main-template [{:keys [score last-value cur-time jump-count
-                             timer-running border-pos
+                             timer-running border-pos initial-vel cur-vel
                              flappy-y pillar-list]}]
   (sab/html [:div.board { :onMouseDown (fn [e]
                                          (swap! flap-state jump)
                                          (.preventDefault e))}
              [:h1.score score]
+             [:h4.debug initial-vel cur-vel]
              (if (and timer-running
                       last-value)
                [:div.analog
