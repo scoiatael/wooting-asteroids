@@ -25,6 +25,7 @@
 (def pillar-width 86)
 (def max-analog-width 300)
 (def analog-jump-vel 2)
+(def rotate-angle 2)
 
 (defonce ^:private root (.createRoot js/ReactDOM (.getElementById js/document "board-area")))
 
@@ -225,7 +226,7 @@
                 (if (< 1 jump-count) "RESTART" "START")])
                (sab/html [:span]))
              [:div (map pillar pillar-list)]
-             [:div.flappy {:style {:top (px flappy-y)}}]
+             [:div.flappy {:style {:top (px flappy-y) :rotate (gstring/format "%.3fdeg" (- 0 (* rotate-angle cur-vel)))}}]
              [:div.scrolling-border {:style { :background-position-x (px border-pos)}}]]))
 
 (defn renderer [full-state]
