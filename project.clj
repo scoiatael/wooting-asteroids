@@ -18,5 +18,6 @@
                                   [com.bhauman/rebel-readline-cljs "0.1.4"]
                                   [org.slf4j/slf4j-nop "2.0.3"]]}}
 
-  :aliases {"fig"       ["trampoline" "run" "-m" "figwheel.main"]
-            "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "flappy" "-r"]})
+  :aliases {"dev" ["trampoline" "run" "-m" "figwheel.main" "-b" "flappy" "-r"]
+            ;; https://figwheel.org/docs/advanced_compile.html
+            "build" ["trampoline" "run" "-m" "figwheel.main" "-bo" "flappy"]})

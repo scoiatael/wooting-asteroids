@@ -34,7 +34,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - uses: DeterminateSystems/nix-installer-action@main
-      - run: nix-shell -p leiningen --run "lein run -m figwheel.main -bo flappy"
+      - run: nix-shell -p leiningen --run "lein build"
       - run: cp -r resources/public/* target/public/
         # Adjust build paths for Github Pages
       - run: sed -i 's|/cljs-out|cljs-out|g' target/public/cljs-out/flappy-main.js
