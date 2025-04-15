@@ -48,11 +48,11 @@
 
 (defn- main-template [{:keys [destroyed score timer-running camera player asteroids snitch]} keyboard]
   (sab/html [:div.board
+             [:h1.score score]
              (when timer-running
                [:div.debug-hud
                 [:div
                  [:h4.debug "asteroids: " (count asteroids)]
-                 [:h4.debug "score: " score]
                  (when snitch [:h4.debug "distance: " (game/distance-from player snitch)])]
                 [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (or (keyboard key) 0))]) ["A" "W" "D" "S"])]
