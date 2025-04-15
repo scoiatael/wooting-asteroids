@@ -21,7 +21,7 @@
 
 (defn- rotation-classes [keyboard]
   (let [rotation (game/added-rotation keyboard)]
-   (str (display-magnitude rotation) " " (sgn rotation "left-thrust" "right-thrust"))))
+   (str (display-magnitude rotation) " " (sgn rotation "right-thrust" "left-thrust"))))
 
 (defn- render-player [{:keys [cur-x cur-y rotation]} keyboard]
   [:div.ship {:style {:top (px (- cur-y game/player-radius)) :left (px (- cur-x game/player-radius)) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}
@@ -90,13 +90,13 @@
                (sab/html [:span]))
              (when timer-running
                (render-player (translate-with-camera camera player) keyboard))
-             (when true;; shield-used
+             (when shield-used
                  (render-player-shield (translate-with-camera camera player)))
              (when destroyed
                (render-explosion (translate-with-camera camera player)))
              (when snitch
                (render-snitch (translate-with-camera camera snitch)))
-             (when true;; (and snitch timer-running)
+             (when (and snitch timer-running)
                (render-snitch-tracker (translate-with-camera camera snitch) (translate-with-camera camera player)))
              (when timer-running
                (render-shield game))
