@@ -10,18 +10,23 @@
 
 (defn px [n] (str n "px"))
 
+(defn- display-magnitude [thrust]
+        (condp > (.abs js/Math thrust) 0.1 "" 0.3 "small-thrust" 0.7 "big-thrust" "great-thrust"))
+
+(defn- sgn [v a b] (if (> 0 v) a b))
+
+(defn- thrust-classes [keyboard]
+  (let [thrust (game/added-speed keyboard)]
+   (str (display-magnitude thrust) " " (sgn thrust "forward-thrust" "reverse-thrust"))))
+
+(defn- rotation-classes [keyboard]
+  (let [rotation (game/added-rotation keyboard)]
+   (str (display-magnitude rotation) " " (sgn rotation "left-thrust" "right-thrust"))))
+
 (defn- render-player [{:keys [cur-x cur-y rotation]} keyboard]
-  (let [thrust (game/added-speed keyboard)
-        thrust-degree (condp > (.abs js/Math thrust) 0.1 "" 0.3 "small-thrust" 0.7 "big-thrust" "great-thrust")
-        is-forward-thrust (> 0 thrust)
-        extra-rotation (game/added-rotation keyboard)
-        rotation-degree (condp > (.abs js/Math extra-rotation) 0.1 "" 0.3 "small-thrust" 0.7 "big-thrust" "great-thrust")
-        is-left-rotation (< 0 extra-rotation)
-        thrust-direction (if is-forward-thrust "forward-thrust" "reverse-thrust")
-        rotation-direction (if is-left-rotation "left-thrust" "right-thrust")]
     [:div.ship {:style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}
-     [:div.ship-effect {:class (str rotation-degree " " rotation-direction)}]
-     [:div.ship-effect {:class (str thrust-degree " " thrust-direction )}]]))
+     [:div.ship-effect {:class (thrust-classes keyboard)}]
+     [:div.ship-effect {:class (rotation-classes keyboard)}]])
 
 (defn- main-template [{:keys [timer-running player]} keyboard]
   (sab/html [:div.board
