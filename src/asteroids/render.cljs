@@ -24,6 +24,7 @@
    (str (display-magnitude rotation) " " (sgn rotation "left-thrust" "right-thrust"))))
 
 (def ^:private player-radius 50)
+(def ^:private snitch-radius 10)
 
 (defn- render-player [{:keys [cur-x cur-y rotation]} keyboard]
   [:div.ship {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius)) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}
@@ -34,12 +35,12 @@
     [:div.ship-explosion {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius))}}])
 
 (defn- render-snitch [{:keys [cur-x cur-y]}]
-    [:div.snitch {:style {:top (px cur-y) :left (px cur-x)}}])
+  [:div.snitch {:style {:top (px (- cur-y snitch-radius)) :left (px (- cur-x snitch-radius))}}])
 
 (defn- render-snitch-tracker [snitch {:keys [cur-x cur-y] :as player}]
   (let [[dx dy] (game/direction-from player snitch)
         rotation (* -1 (.atan2 js/Math dx dy))
-        distance (game/distance-between 0 dx 0 dy)]
+        distance (game/distance-from player snitch)]
     (if (> distance 100)
       [:div.snitch-tracker {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius)) :rotate (gstring/format "%.3frad" rotation)}}]
       [:div])))
