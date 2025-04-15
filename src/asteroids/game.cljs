@@ -115,12 +115,12 @@
     game))
 
 (def ^:private visible-distance 800)
+(def ^:private initial-xs-offset [-700 -40 300 700])
+(def ^:private initial-ys-offset [-800 -300 50 800])
+(def ^:private culling-distance 1800)
 
 (defn- visible-from [player asteroid]
   (< (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)) visible-distance))
-
-(def ^:private initial-xs-offset [-700 -40 300 700])
-(def ^:private initial-ys-offset [-800 -300 50 800])
 
 (defn- new-asteroid [cur-time {:keys [cur-x cur-y vel-x vel-y]} idx]
   (let [seed (.floor js/Math (+ (* 10 cur-time ) idx))
@@ -142,10 +142,8 @@
         new-asteroids (map-indexed #(new-asteroid cur-time player %1) (repeat target {}))]
     (assoc game :asteroids (apply conj asteroids new-asteroids))))
 
-(def ^:private visible-distance 1800)
-
 (defn- alive [player asteroid]
-  (< (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)) culling-distance))
+  (> (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)) culling-distance))
 
 (defn- prune-asteroids [{:keys [player asteroids] :as game}]
   (assoc game :asteroids (filter #(not (alive player %)) asteroids)))
