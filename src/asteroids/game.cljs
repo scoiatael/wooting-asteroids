@@ -10,22 +10,27 @@
 (def ^:private initial-vx [-0.0001 0.0002 -0.0003])
 (def ^:private initial-vy [0.0001 -0.0004 -0.0001])
 
+(def ^:private camera-offset-x (- (/ 640 2) 50))
+(def ^:private camera-offset-y (- (/ 640 2) 50))
+
 (def ^:private starting-state {:timer-running false
-                               :player {:cur-x (- (/ 640 2) 50)
-                                        :cur-y (- (/ 640 2) 50)
+                               :player {:cur-x camera-offset-x
+                                        :cur-y camera-offset-y
                                         :rotation 0
                                         :vel-x 0
                                         :vel-y 0}
+                               :camera {:ox 0
+                                        :oy 0}
                                :asteroids (map-indexed  (fn [idx variant]
-                                                           {:cur-x (get initial-xs (mod idx 3))
-                                                            :cur-y (get initial-ys (mod idx 3))
-                                                            :rotation (/ idx 4)
-                                                            :id (str idx)
-                                                            :variant variant
-                                                            :vel-rot (* 0.00002 idx)
-                                                            :vel-x (get initial-vx (mod idx 3))
-                                                            :vel-y (get initial-vy (mod idx 3))})
-                                                         [:big :small-1 :small-2 :small-3 :small-4])})
+                                                          {:cur-x (get initial-xs (mod idx 3))
+                                                           :cur-y (get initial-ys (mod idx 3))
+                                                           :rotation (/ idx 4)
+                                                           :id (str idx)
+                                                           :variant variant
+                                                           :vel-rot (* 0.00002 idx)
+                                                           :vel-x (get initial-vx (mod idx 3))
+                                                           :vel-y (get initial-vy (mod idx 3))})
+                                                        [:big :small-1 :small-2 :small-3 :small-4])})
 
 (defonce state (atom starting-state))
 
@@ -58,19 +63,15 @@
                                        :vel-x new-x
                                        :vel-y new-y)))))
 
-(defn update-ship-position [{:keys [time-delta] :as game}]
+(defn- update-ship-position [{:keys [time-delta] :as game}]
   (update-in game [:player] (fn [{:keys [vel-x vel-y cur-x cur-y] :as player}]
                                   (let [new-x (+ cur-x (* time-delta vel-x))
-                                        new-x (min new-x (- 640 50))
-                                        new-x (max new-x (- 0 50))
-                                        new-y (+ cur-y (* time-delta vel-y))
-                                        new-y (min new-y (- 640 50))
-                                        new-y (max new-y (- 0 50))]
+                                        new-y (+ cur-y (* time-delta vel-y))]
                                     (assoc player
                                            :cur-x new-x
                                            :cur-y new-y)))))
 
-(defn update-asteroids [{:keys [asteroids time-delta] :as game}]
+(defn- update-asteroids [{:keys [asteroids time-delta] :as game}]
   (assoc-in game [:asteroids] (map  (fn [{:keys [vel-x vel-y vel-rot cur-x cur-y rotation] :as asteroid}]
                                       (let [new-x (+ cur-x (* time-delta vel-x))
                                             new-rotation (+ rotation (* time-delta vel-rot))
@@ -80,6 +81,19 @@
                                                :cur-x new-x
                                                :cur-y new-y))) asteroids)))
 
+
+(defn- distance-between [x1 y1 x2 y2]
+  (let [dx (- x2 x1)
+        dy (- y2 y1)]
+    (Math/sqrt (+ (* dx dx) (* dy dy)))))
+
+(defn- update-camera [{:keys [camera player] :as game}]
+  (let [{:keys [cur-x cur-y]} player
+        {:keys [ox oy]} camera
+        distance (distance-between ox oy (- cur-x camera-offset-x) (- cur-y camera-offset-y))
+        [new-x new-y] (if (< distance 100) [ox oy] [(- cur-x camera-offset-x) (- cur-y camera-offset-y)])]
+    (assoc game :camera {:ox new-x :oy new-y})))
+
 (defn- time-update [timestamp state]
   (-> state
       (assoc
@@ -87,8 +101,9 @@
        :time-delta (- timestamp (:cur-time state)))
       (update-rotation @device/keyboard-state)
       (update-vel @device/keyboard-state)
+      (update-ship-position)
       (update-asteroids)
-      (update-ship-position)))
+      (update-camera)))
 
 (defn- time-loop [time]
   (let [new-state (swap! state (partial time-update time))]

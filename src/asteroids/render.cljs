@@ -31,24 +31,31 @@
 (defn- render-asteroid [{:keys [id cur-x cur-y rotation variant] :as asteroid}]
   [:div.asteroid {:key id :class (str "asteroid-" (name variant)) :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
 
-(defn- render-asteroids [asteroids]
-    [:div.asteroid-field
-     (map render-asteroid asteroids)])
+(defn- translate-with-camera [{:keys [ox oy]} {:keys [cur-x cur-y] :as item}]
+  (assoc item
+         :cur-x (- cur-x ox)
+         :cur-y (- cur-y oy)))
 
-(defn- main-template [{:keys [timer-running player asteroids]} keyboard]
+(defn- render-asteroids [camera asteroids]
+    [:div.asteroid-field
+     (map #(->> % (translate-with-camera camera) render-asteroid) asteroids)])
+
+(defn- main-template [{:keys [timer-running camera player asteroids]} keyboard]
   (sab/html [:div.board
              (when timer-running
                [:div.debug-hud
                 [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (or (keyboard key) 0))]) ["A" "W" "D" "S"])]
                 [:div
+                 (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %s" key (key camera))]) [:ox :oy])]
+                [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key player))]) [:cur-x :cur-y :vel-x :vel-y :rotation])]])
              (if-not timer-running
                (sab/html [:a.start-button {:onClick #(do (device/start) (game/start))} "START"])
                (sab/html [:span]))
              (when timer-running
-               (render-player player keyboard))
-             (render-asteroids asteroids)]))
+               (render-player (translate-with-camera camera player) keyboard))
+             (render-asteroids camera asteroids)]))
 
 (defn render [full-state keyboard]
   (.render root (main-template full-state keyboard)))
