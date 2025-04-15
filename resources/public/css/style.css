@@ -27,13 +27,11 @@ body {
   background: transparent url(../imgs/scrolling-border.png) repeat-x top left;
 }
 
-.asteroids {
+.ship {
     position: absolute;
-    background: transparent url(../imgs/asteroids-base.png) no-repeat top left;
-    top: 312px;
-    left: 212px;
-    width: 57px;
-    height: 41px;
+    background: transparent url(../imgs/ship-base.svg) no-repeat top left;
+    width: 100px;
+    height: 100px;
 }
 
 .pillar {

@@ -1,7 +1,11 @@
 (ns asteroids.game)
 
 
-(def ^:private starting-state {:timer-running false})
+(def ^:private starting-state {:timer-running false
+                               :player {:cur-x (- (/ 480 2) 50)
+                                        :cur-y (- (/ 640 2) 50)
+                                        :vel-x 0
+                                        :vel-y 0}})
 
 (defonce state (atom starting-state))
 

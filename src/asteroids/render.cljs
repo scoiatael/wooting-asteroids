@@ -8,7 +8,12 @@
 
 (defonce ^:private root (.createRoot js/ReactDOM (.getElementById js/document "board-area")))
 
-(defn- main-template [{:keys [timer-running]} keyboard]
+(defn px [n] (str n "px"))
+
+(defn- render-player [{:keys [cur-x cur-y]}]
+  [:div.ship {:style {:top (px cur-y) :left (px cur-x)}}])
+
+(defn- main-template [{:keys [timer-running player]} keyboard]
   (sab/html [:div.board
              (when timer-running
                [:div
@@ -16,6 +21,8 @@
              (if-not timer-running
                (sab/html [:a.start-button {:onClick #(do (device/start) (game/start))} "START"])
                (sab/html [:span]))
+             (when timer-running
+               (render-player player))
              ;; [:div (map pillar pillar-list)]
              ;; [:div.asteroids {:style {:top (px asteroids-y) :rotate (gstring/format "%.3fdeg" (- 0 (* rotate-angle cur-vel)))}}]
              ;; [:div.scrolling-border {:style { :background-position-x (px border-pos)}}]
