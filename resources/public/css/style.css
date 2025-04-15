@@ -27,6 +27,13 @@ body {
   background: transparent url(../imgs/scrolling-border.png) repeat-x top left;
 }
 
+.snitch {
+    position: absolute;
+    background: transparent url(../imgs/snitch.svg) no-repeat top left;
+    width: 20px;
+    height: 20px;
+}
+
 .ship {
     position: absolute;
     background: transparent url(../imgs/ship-base.svg) no-repeat top left;

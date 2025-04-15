@@ -22,7 +22,7 @@
         dy (- y2 y1)]
     (Math/sqrt (+ (* dx dx) (* dy dy)))))
 
-(defn- distance-from [player asteroid]
+(defn distance-from [player asteroid]
   (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)))
 
 (defn- visible-from [player asteroid]
@@ -58,21 +58,32 @@
   (let [on-screen (count (filter #(visible-from player %) asteroids))
         target (- wanted-asteroids on-screen)
         new-asteroids (map-indexed #(new-asteroid (if (= 0 cur-time) 200 800) cur-time player %1) (repeat target {}))]
-    (when (seq new-asteroids) (prn  new-asteroids))
     (assoc game :asteroids (apply conj asteroids new-asteroids))))
 
+(defn- spawn-snitch [{:keys [cur-time player asteroids] :as game}]
+  (let [seed (.floor js/Math (* 13 cur-time))
+        [x y] (random-point-on-circle seed player (mod seed 1200))]
+    (assoc game :snitch {:cur-x x
+                         :cur-y y
+                         :rotation 0
+                         :vel-x 0
+                         :vel-y 0})))
 
-(def ^:private starting-state (spawn-asteroids {:timer-running false
-                                                :destroyed false
-                                                :player {:cur-x camera-offset-x
-                                                         :cur-y camera-offset-y
-                                                         :rotation 0
-                                                         :vel-x 0
-                                                         :vel-y 0}
-                                                :camera {:ox 0
-                                                         :oy 0}
-                                                :cur-time 0
-                                                :asteroids []}))
+(def ^:private starting-state (-> {:timer-running false
+                                   :score 0
+                                   :destroyed false
+                                   :snitch nil
+                                   :player {:cur-x camera-offset-x
+                                            :cur-y camera-offset-y
+                                            :rotation 0
+                                            :vel-x 0
+                                            :vel-y 0}
+                                   :camera {:ox 0
+                                            :oy 0}
+                                   :cur-time 0
+                                   :asteroids []}
+                                  spawn-snitch
+                                  spawn-asteroids))
 
 (defonce state (atom starting-state))
 
@@ -136,16 +147,24 @@
     :big 100
     50))
 
-(defn- has-collision [{:keys [variant] :as asteroid} player]
-  (let [size (asteroid-size variant)
-        radius (/ size 2)]
-    (> (- size 10) (distance-between (- (:cur-x asteroid) radius) (- (:cur-y asteroid) radius) (- (:cur-x player) 50) (- (:cur-y player) 50)))))
+(defn- has-collision [object player size]
+  (let [radius (/ size 2)]
+    (> (- size 10) (distance-between (- (:cur-x object) radius) (- (:cur-y object) radius) (- (:cur-x player) 50) (- (:cur-y player) 50)))))
 
 (defn- check-collisions [{:keys [player asteroids] :as game}]
-  (if (some #(has-collision player %) asteroids)
+  (if (some #(has-collision player % (asteroid-size (:variant %))) asteroids)
     (assoc game
            :timer-running false
            :destroyed true)
+    game))
+
+(def ^:private snitch-size 20)
+
+(defn- check-snitch-collision [{:keys [player snitch score] :as game}]
+  (if (has-collision player snitch snitch-size)
+    (assoc game :score
+           (inc score)
+           :snitch nil)
     game))
 
 (defn- alive [player asteroid]
@@ -166,7 +185,8 @@
       (update-asteroids)
       (update-camera)
       (prune-asteroids)
-      (spawn-asteroids)))
+      (spawn-asteroids)
+      (check-snitch-collision)))
 
 (defn- time-loop [time]
   (let [new-state (swap! state (partial time-update time))]

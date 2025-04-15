@@ -28,8 +28,11 @@
      [:div.ship-effect {:class (thrust-classes keyboard)}]
      [:div.ship-effect {:class (rotation-classes keyboard)}]])
 
-(defn- render-explosion [{:keys [cur-x cur-y rotation]}]
+(defn- render-explosion [{:keys [cur-x cur-y]}]
     [:div.ship-explosion {:style {:top (px cur-y) :left (px cur-x)}}])
+
+(defn- render-snitch [{:keys [cur-x cur-y rotation]}]
+    [:div.snitch {:style {:top (px cur-y) :left (px cur-x)}}])
 
 (defn- render-asteroid [{:keys [id cur-x cur-y rotation variant] :as asteroid}]
   [:div.asteroid {:key id :class (str "asteroid-" (name variant)) :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
@@ -43,15 +46,21 @@
     [:div.asteroid-field
      (map #(->> % (translate-with-camera camera) render-asteroid) asteroids)])
 
-(defn- main-template [{:keys [destroyed timer-running camera player asteroids]} keyboard]
+(defn- main-template [{:keys [destroyed score timer-running camera player asteroids snitch]} keyboard]
   (sab/html [:div.board
              (when timer-running
                [:div.debug-hud
-                [:h4.debug "asteroids: " (count asteroids)]
+                [:div
+                 [:h4.debug "asteroids: " (count asteroids)]
+                 [:h4.debug "score: " score]
+                 (when snitch [:h4.debug "distance: " (game/distance-from player snitch)])]
                 [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (or (keyboard key) 0))]) ["A" "W" "D" "S"])]
                 [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key camera))]) [:ox :oy])]
+                (when snitch
+                  [:div
+                   (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key snitch))]) [:cur-x :cur-y])])
                 [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key player))]) [:cur-x :cur-y :vel-x :vel-y :rotation])]])
              (if-not timer-running
@@ -61,6 +70,8 @@
                (render-player (translate-with-camera camera player) keyboard))
              (when destroyed
                (render-explosion (translate-with-camera camera player)))
+             (when snitch
+               (render-snitch (translate-with-camera camera snitch)))
              (render-asteroids camera asteroids)]))
 
 (defn render [full-state keyboard]
