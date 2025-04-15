@@ -47,7 +47,7 @@
                 [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (or (keyboard key) 0))]) ["A" "W" "D" "S"])]
                 [:div
-                 (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %s" key (key camera))]) [:ox :oy])]
+                 (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key camera))]) [:ox :oy])]
                 [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key player))]) [:cur-x :cur-y :vel-x :vel-y :rotation])]])
              (if-not timer-running

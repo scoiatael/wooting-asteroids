@@ -87,12 +87,12 @@
         dy (- y2 y1)]
     (Math/sqrt (+ (* dx dx) (* dy dy)))))
 
-(defn- update-camera [{:keys [camera player] :as game}]
+(defn- update-camera [{:keys [time-delta camera player] :as game}]
   (let [{:keys [cur-x cur-y]} player
-        {:keys [ox oy]} camera
-        distance (distance-between ox oy (- cur-x camera-offset-x) (- cur-y camera-offset-y))
-        [new-x new-y] (if (< distance 100) [ox oy] [(- cur-x camera-offset-x) (- cur-y camera-offset-y)])]
-    (assoc game :camera {:ox new-x :oy new-y})))
+        {:keys [ox oy vel-x vel-y]} camera
+        px (- cur-x camera-offset-x)
+        py (- cur-y camera-offset-y)]
+    (assoc game :camera {:ox px :oy py})))
 
 (defn- time-update [timestamp state]
   (-> state
