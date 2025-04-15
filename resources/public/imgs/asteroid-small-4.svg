@@ -1,0 +1,20 @@
+<svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fragment shape - small triangular piece -->
+  <path d="M15,3 L23,12 L20,22 L10,25 L5,15 L8,7 Z"
+        fill="#656565"
+        stroke="#333"
+        stroke-width="1.5"/>
+
+  <!-- Minimal surface detail -->
+  <path d="M12,14 L15,16 L13,17 Z" fill="#555"/>
+
+  <!-- Fracture edge detail -->
+  <path d="M23,12 L20,16 L25,16 Z"
+        fill="#777"
+        stroke="#444"
+        stroke-width="0.5"/>
+  <path d="M10,25 L12,22 L8,20 Z"
+        fill="#777"
+        stroke="#444"
+        stroke-width="0.5"/>
+</svg>

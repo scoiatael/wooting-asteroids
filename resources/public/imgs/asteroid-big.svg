@@ -1,0 +1,21 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main asteroid shape -->
+  <path d="M50,10 L65,15 L80,30 L85,50 L75,70 L60,85 L40,90 L20,80 L10,60 L15,40 L30,20 Z"
+        fill="#6b6b6b"
+        stroke="#333"
+        stroke-width="2"/>
+
+  <!-- Crater details -->
+  <circle cx="35" cy="35" r="5" fill="#555"/>
+  <circle cx="60" cy="45" r="7" fill="#555"/>
+  <circle cx="40" cy="65" r="6" fill="#555"/>
+  <circle cx="70" cy="65" r="4" fill="#555"/>
+  <circle cx="25" cy="50" r="3" fill="#555"/>
+
+  <!-- Surface texture -->
+  <path d="M30,25 L35,28 L32,30 Z" fill="#555"/>
+  <path d="M65,25 L70,28 L68,32 Z" fill="#555"/>
+  <path d="M50,75 L55,72 L53,78 Z" fill="#555"/>
+  <path d="M20,60 L25,58 L23,65 Z" fill="#555"/>
+  <path d="M75,45 L78,50 L73,52 Z" fill="#555"/>
+</svg>

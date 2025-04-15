@@ -28,7 +28,14 @@
      [:div.ship-effect {:class (thrust-classes keyboard)}]
      [:div.ship-effect {:class (rotation-classes keyboard)}]])
 
-(defn- main-template [{:keys [timer-running player]} keyboard]
+(defn- render-asteroid [{:keys [id cur-x cur-y rotation variant] :as asteroid}]
+  [:div.asteroid {:key id :class (str "asteroid-" (name variant)) :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
+
+(defn- render-asteroids [asteroids]
+    [:div.asteroid-field
+     (map render-asteroid asteroids)])
+
+(defn- main-template [{:keys [timer-running player asteroids]} keyboard]
   (sab/html [:div.board
              (when timer-running
                [:div.debug-hud
@@ -41,10 +48,7 @@
                (sab/html [:span]))
              (when timer-running
                (render-player player keyboard))
-             ;; [:div (map pillar pillar-list)]
-             ;; [:div.asteroids {:style {:top (px asteroids-y) :rotate (gstring/format "%.3fdeg" (- 0 (* rotate-angle cur-vel)))}}]
-             ;; [:div.scrolling-border {:style { :background-position-x (px border-pos)}}]
-             ]))
+             (render-asteroids asteroids)]))
 
 (defn render [full-state keyboard]
   (.render root (main-template full-state keyboard)))

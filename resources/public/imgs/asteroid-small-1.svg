@@ -1,0 +1,20 @@
+<svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main fragment shape - irregular and jagged -->
+  <path d="M25,5 L35,12 L40,25 L30,40 L15,38 L8,25 L12,15 Z"
+        fill="#6b6b6b"
+        stroke="#333"
+        stroke-width="1.5"/>
+
+  <!-- Crater detail - just one small one -->
+  <circle cx="22" cy="22" r="3" fill="#555"/>
+
+  <!-- Surface texture - less detail than parent -->
+  <path d="M15,15 L18,17 L16,19 Z" fill="#555"/>
+  <path d="M30,25 L33,27 L31,30 Z" fill="#555"/>
+
+  <!-- Exposed/fractured edge -->
+  <path d="M35,12 L33,18 L38,20 Z"
+        fill="#777"
+        stroke="#444"
+        stroke-width="0.5"/>
+</svg>

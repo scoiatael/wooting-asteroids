@@ -1,0 +1,21 @@
+<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fragment shape - elongated and pointed -->
+  <path d="M20,5 L30,15 L35,25 L25,35 L15,30 L5,20 L10,10 Z"
+        fill="#727272"
+        stroke="#333"
+        stroke-width="1.5"/>
+
+  <!-- Surface details -->
+  <circle cx="18" cy="18" r="2" fill="#555"/>
+  <path d="M25,22 L28,24 L26,26 Z" fill="#555"/>
+
+  <!-- Exposed edges from fracture -->
+  <path d="M30,15 L28,18 L32,20 Z"
+        fill="#7d7d7d"
+        stroke="#444"
+        stroke-width="0.5"/>
+  <path d="M15,30 L18,28 L17,33 Z"
+        fill="#7d7d7d"
+        stroke="#444"
+        stroke-width="0.5"/>
+</svg>

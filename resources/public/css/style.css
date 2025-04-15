@@ -166,6 +166,41 @@ body {
     text-shadow: -3px 0 black, 0 3px black, 3px 0 black, 0 -3px black;
 }
 
+.asteroid-big {
+    position: absolute;
+    background: transparent url(../imgs/asteroid-big.svg) no-repeat top left;
+    width: 100px;
+    height: 100px;
+}
+
+.asteroid-small-1 {
+    background: transparent url(../imgs/asteroid-small-1.svg) no-repeat top left;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+.asteroid-small-2 {
+    background: transparent url(../imgs/asteroid-small-2.svg) no-repeat top left;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+.asteroid-small-3 {
+    background: transparent url(../imgs/asteroid-small-3.svg) no-repeat top left;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+.asteroid-small-4 {
+    background: transparent url(../imgs/asteroid-small-4.svg) no-repeat top left;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
 @media (max-width: 480px){
     body {
         margin: 0px;

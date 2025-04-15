@@ -4,12 +4,25 @@
 (def ^:private rotation-speed 0.001)
 (def ^:private acceleration 0.0001)
 
+(def ^:private initial-xs [128 467 600])
+(def ^:private initial-ys [53 128 400])
+
 (def ^:private starting-state {:timer-running false
                                :player {:cur-x (- (/ 640 2) 50)
                                         :cur-y (- (/ 640 2) 50)
                                         :rotation 0
                                         :vel-x 0
-                                        :vel-y 0}})
+                                        :vel-y 0}
+                               :asteroids (map-indexed  (fn [idx variant]
+                                                           {:cur-x (get initial-xs (mod idx 3))
+                                                            :cur-y (get initial-ys (mod idx 3))
+                                                            :rotation (/ idx 4)
+                                                            :id (str idx)
+                                                            :variant variant
+                                                            :vel-rot 0.1
+                                                            :vel-x 0
+                                                            :vel-y 0})
+                                                         [:big :small-1 :small-2 :small-3 :small-4])})
 
 (defonce state (atom starting-state))
 
