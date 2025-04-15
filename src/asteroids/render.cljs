@@ -35,7 +35,7 @@
     [:div.ship-explosion {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius))}}])
 
 (defn- render-snitch [{:keys [cur-x cur-y rotation]}]
-  [:div.snitch {:style {:top (px (- cur-y snitch-radius)) :left (px (- cur-x snitch-radius)) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
+  [:div.snitch {:style {:top (px (- cur-y snitch-radius)) :left (px (- cur-x snitch-radius)) :rotate (gstring/format "%.3frad" rotation)}}])
 
 (defn- render-snitch-tracker [snitch {:keys [cur-x cur-y] :as player}]
   (let [[dx dy] (game/direction-from player snitch)

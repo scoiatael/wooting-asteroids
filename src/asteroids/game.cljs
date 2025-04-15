@@ -178,11 +178,11 @@
       game)))
 
 (defn- apply-snitch-behaviour [behaviour [distance dx dy] snitch]
-  (let [rotation (* -1 (.atan2 js/Math dx dy))
+  (let [rotation (.atan2 js/Math dx dy)
         ndx (/ dx distance)
         ndy (/ dy distance)]
     (condp = behaviour
-      :run-towards [(* -1 rotation) (* snitch-towards-speed ndx) (* snitch-towards-speed ndy)]
+      :run-towards [rotation (* snitch-towards-speed ndx) (* snitch-towards-speed ndy)]
       :run-away [rotation (* -1 ndx snitch-away-speed) (* -1 ndy snitch-away-speed)]
       [0 0 0])))
 
