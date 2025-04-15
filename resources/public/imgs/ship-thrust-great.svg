@@ -1,0 +1,14 @@
+<svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <!-- Thruster flame (when active) -->
+  <polygon
+    points="25,30 23,37 25,42 27,37"
+    fill="#ff6b00"
+    stroke="#ffcc00"
+    stroke-width="0.3" />
+
+  <!-- Inner flame glow -->
+  <polygon
+    points="25,30 24,37 25,38 26,37"
+    fill="#ffcc00"
+    stroke="none" />
+</svg>

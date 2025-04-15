@@ -34,20 +34,46 @@ body {
     height: 100px;
 }
 
+.ship-effect {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+
+.small-thrust {
+    background: transparent url(../imgs/ship-thrust-small.svg) no-repeat top left;
+}
+
+.big-thrust {
+    background: transparent url(../imgs/ship-thrust-big.svg) no-repeat top left;
+}
+
+.great-thrust {
+    background: transparent url(../imgs/ship-thrust-great.svg) no-repeat top left;
+}
+
 .forward-thrust {
-    background: transparent url(../imgs/ship-forward-thrust.svg) no-repeat top left;
+  scale: 1.5;
 }
 
 .reverse-thrust {
-    background: transparent url(../imgs/ship-reverse-thrust.svg) no-repeat top left;
+  top: -22px;
+  rotate: 180deg;
 }
 
 .left-thrust {
-    background: transparent url(../imgs/ship-left-thrust.svg) no-repeat top left;
+  rotate: 90deg;
+  top: -32px;
+  left: 8px;
 }
 
 .right-thrust {
-    background: transparent url(../imgs/ship-right-thrust.svg) no-repeat top left;
+  rotate: -90deg;
+  top: -32px;
+  left: -8px;
 }
 
 .pillar {

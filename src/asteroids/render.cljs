@@ -12,16 +12,16 @@
 
 (defn- render-player [{:keys [cur-x cur-y rotation]} keyboard]
   (let [thrust (game/added-speed keyboard)
-        is-thrust-active (< 0.1 (.abs js/Math thrust))
+        thrust-degree (condp > (.abs js/Math thrust) 0.1 "" 0.3 "small-thrust" 0.7 "big-thrust" "great-thrust")
         is-forward-thrust (> 0 thrust)
         extra-rotation (game/added-rotation keyboard)
-        is-rotation-active (< 0.1 (.abs js/Math extra-rotation))
+        rotation-degree (condp > (.abs js/Math extra-rotation) 0.1 "" 0.3 "small-thrust" 0.7 "big-thrust" "great-thrust")
         is-left-rotation (< 0 extra-rotation)
-
-        class ""
-        class (str class " " (if is-thrust-active (if is-forward-thrust "forward-thrust" "reverse-thrust") ""))
-        class (str class " " (if is-rotation-active (if is-left-rotation "left-thrust" "right-thrust")))]
-    [:div.ship {:class class :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}]))
+        thrust-direction (if is-forward-thrust "forward-thrust" "reverse-thrust")
+        rotation-direction (if is-left-rotation "left-thrust" "right-thrust")]
+    [:div.ship {:style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}
+     [:div.ship-effect {:class (str rotation-degree " " rotation-direction)}]
+     [:div.ship-effect {:class (str thrust-degree " " thrust-direction )}]]))
 
 (defn- main-template [{:keys [timer-running player]} keyboard]
   (sab/html [:div.board
