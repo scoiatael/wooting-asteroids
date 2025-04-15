@@ -4,6 +4,12 @@
 (def ^:private rotation-speed 0.001)
 (def ^:private acceleration 0.0001)
 
+(def ^:private snitch-towards-speed 0.02)
+(def ^:private snitch-away-speed 0.06)
+(def ^:private snitch-attraction-radius 70)
+(def ^:private snitch-ignore-radius 200)
+(def ^:private snitch-repelling-radius 800)
+
 (def ^:private initial-vx [-0.0001 0.0002 -0.0003])
 (def ^:private initial-vy [0.0001 -0.0004 -0.0001])
 
@@ -164,11 +170,37 @@
 (def ^:private snitch-size 30)
 
 (defn- check-snitch-collision [{:keys [player snitch score] :as game}]
-  (if (has-collision player snitch snitch-size)
-    (-> game (assoc :score (inc score)
-                    :snitch nil)
-        (spawn-snitch))
-    game))
+  (let [distance (distance-from player snitch)]
+    (if (> snitch-size distance)
+      (-> game (assoc :score (inc score)
+                      :snitch nil)
+          (spawn-snitch))
+      game)))
+
+(defn- apply-snitch-behaviour [behaviour [distance dx dy] snitch]
+  (let [rotation (* -1 (.atan2 js/Math dx dy))
+        ndx (/ dx distance)
+        ndy (/ dy distance)]
+    (condp = behaviour
+      :run-towards [(* -1 rotation) (* snitch-towards-speed ndx) (* snitch-towards-speed ndy)]
+      :run-away [rotation (* -1 ndx snitch-away-speed) (* -1 ndy snitch-away-speed)]
+      [0 0 0])))
+
+(defn- update-snitch [{:keys [snitch time-delta player] :as game}]
+  (let [[dx dy] (direction-from player snitch)
+        rotation (* -1 (.atan2 js/Math dx dy))
+        distance (distance-from player snitch)
+        behaviour (condp > distance snitch-attraction-radius :run-towards snitch-ignore-radius :do-nothing snitch-repelling-radius :run-away :do-nothing)
+        [rotation vx vy] (apply-snitch-behaviour behaviour [distance dx dy] snitch)]
+    (update-in game [:snitch]
+               (fn [{:keys [cur-x cur-y vel-x vel-y]}]
+                 (assoc snitch
+                        :behaviour behaviour
+                        :cur-x (+ cur-x (* time-delta vel-x))
+                        :cur-y (+ cur-y (* time-delta vel-y))
+                        :rotation rotation
+                        :vel-x vx
+                        :vel-y vy)))))
 
 (defn- alive [player asteroid]
   (> (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)) culling-distance))
@@ -189,7 +221,8 @@
       (update-camera)
       (prune-asteroids)
       (spawn-asteroids)
-      (check-snitch-collision)))
+      (check-snitch-collision)
+      (update-snitch)))
 
 (defn- time-loop [time]
   (let [new-state (swap! state (partial time-update time))]

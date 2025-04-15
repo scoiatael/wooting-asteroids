@@ -74,7 +74,9 @@
                 (when snitch
                   [:div
                    [:h4.debug "snitch"]
-                   (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key snitch))]) [:cur-x :cur-y])])
+                   (if-let [behaviour (:behaviour snitch)]
+                     [:h4.debug (str "behaviour: " (name behaviour)) ])
+                   (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key snitch))]) [:cur-x :cur-y :rotation])])
                 [:div
                  [:h4.debug "player"]
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key player))]) [:cur-x :cur-y :vel-x :vel-y :rotation])]])
