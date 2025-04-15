@@ -47,6 +47,7 @@
   (sab/html [:div.board
              (when timer-running
                [:div.debug-hud
+                [:h4.debug "asteroids: " (count asteroids)]
                 [:div
                  (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (or (keyboard key) 0))]) ["A" "W" "D" "S"])]
                 [:div

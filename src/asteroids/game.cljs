@@ -13,6 +13,10 @@
 (def ^:private camera-offset-x (- (/ 640 2) 50))
 (def ^:private camera-offset-y (- (/ 640 2) 50))
 
+(def ^:private wanted-asteroids 30)
+
+(def ^:priate variants [:big :small-1 :small-2 :small-3 :small-4])
+
 (def ^:private starting-state {:timer-running false
                                :destroyed false
                                :player {:cur-x camera-offset-x
@@ -31,7 +35,7 @@
                                                            :vel-rot (* 0.00002 idx)
                                                            :vel-x (get initial-vx (mod idx 3))
                                                            :vel-y (get initial-vy (mod idx 3))})
-                                                        [:big :small-1 :small-2 :small-3 :small-4])})
+                                                        variants)})
 
 (defonce state (atom starting-state))
 
@@ -110,6 +114,42 @@
            :destroyed true)
     game))
 
+(def ^:private visible-distance 800)
+
+(defn- visible-from [player asteroid]
+  (< (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)) visible-distance))
+
+(def ^:private initial-xs-offset [-700 -40 300 700])
+(def ^:private initial-ys-offset [-800 -300 50 800])
+
+(defn- new-asteroid [cur-time {:keys [cur-x cur-y vel-x vel-y]} idx]
+  (let [seed (.floor js/Math (+ (* 10 cur-time ) idx))
+        seed3 (mod seed 3)
+        seed4 (mod seed 4)
+        seed5 (mod seed 5)]
+    {:cur-x (+ vel-x cur-x (get initial-xs-offset seed4) (- (mod seed 128) 64))
+     :cur-y (+ vel-y cur-y (get initial-ys-offset seed4) (- (mod seed 128) 64))
+     :rotation (/ seed3 4)
+     :id (str seed)
+     :variant (get variants seed5)
+     :vel-rot (* 0.00002 idx)
+     :vel-x (+ (/ vel-x 20) (get initial-vx seed3))
+     :vel-y (+ (/ vel-y 20) (get initial-vy seed3))}))
+
+(defn- spawn-asteroids [{:keys [cur-time player asteroids] :as game}]
+  (let [on-screen (count (filter #(visible-from player %) asteroids))
+        target (- wanted-asteroids on-screen)
+        new-asteroids (map-indexed #(new-asteroid cur-time player %1) (repeat target {}))]
+    (assoc game :asteroids (apply conj asteroids new-asteroids))))
+
+(def ^:private visible-distance 1800)
+
+(defn- alive [player asteroid]
+  (< (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)) culling-distance))
+
+(defn- prune-asteroids [{:keys [player asteroids] :as game}]
+  (assoc game :asteroids (filter #(not (alive player %)) asteroids)))
+
 (defn- time-update [timestamp state]
   (-> state
       (assoc
@@ -120,7 +160,9 @@
       (check-collisions)
       (update-ship-position)
       (update-asteroids)
-      (update-camera)))
+      (update-camera)
+      (prune-asteroids)
+      (spawn-asteroids)))
 
 (defn- time-loop [time]
   (let [new-state (swap! state (partial time-update time))]
