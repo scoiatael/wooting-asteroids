@@ -31,9 +31,11 @@
 (defn- main-template [{:keys [timer-running player]} keyboard]
   (sab/html [:div.board
              (when timer-running
-               [:div
-                (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key player))]) [:cur-x :cur-y :vel-x :vel-y :rotation])
-                (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (or (keyboard key) 0))]) ["A" "W" "D" "S"])])
+               [:div.debug-hud
+                [:div
+                 (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (or (keyboard key) 0))]) ["A" "W" "D" "S"])]
+                [:div
+                 (map (fn [key] [:h4.debug {:key key} (gstring/format "%s: %.3f" key (key player))]) [:cur-x :cur-y :vel-x :vel-y :rotation])]])
              (if-not timer-running
                (sab/html [:a.start-button {:onClick #(do (device/start) (game/start))} "START"])
                (sab/html [:span]))
