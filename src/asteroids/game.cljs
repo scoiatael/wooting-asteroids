@@ -22,9 +22,6 @@
         dy (- y2 y1)]
     (Math/sqrt (+ (* dx dx) (* dy dy)))))
 
-
-(defn- sgn [v] (if (> 0 v) -1 1))
-
 (defn- distance-from [player asteroid]
   (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)))
 
@@ -32,7 +29,7 @@
   (< (distance-from player asteroid) visible-distance))
 
 (defn- random-point-on-circle [seed player radius]
-  (let [angle (rand (* 2 Math/PI))
+  (let [angle (* (mod (/ (mod seed 9781) 100) 1) 2 Math/PI)
         x (+ (:cur-x player) (* radius (Math/cos angle)))
         y (+ (:cur-y player) (* radius (Math/sin angle)))]
     [x y]))
@@ -142,7 +139,7 @@
 (defn- has-collision [{:keys [variant] :as asteroid} player]
   (let [size (asteroid-size variant)
         radius (/ size 2)]
-    (> size (distance-between (- (:cur-x asteroid) radius) (- (:cur-y asteroid) radius) (- (:cur-x player) 50) (- (:cur-y player) 50)))))
+    (> (- size 10) (distance-between (- (:cur-x asteroid) radius) (- (:cur-y asteroid) radius) (- (:cur-x player) 50) (- (:cur-y player) 50)))))
 
 (defn- check-collisions [{:keys [player asteroids] :as game}]
   (if (some #(has-collision player %) asteroids)
