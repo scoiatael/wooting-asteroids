@@ -43,15 +43,16 @@ jobs:
             ${{ runner.os }}-maven-
       - run: nix run . -- build
       - run: |
-          mkdir -p target/public/${{ github.sha }}
-          cp -r resources/public/* target/public/${{ github.sha }}
+          mkdir -p public/${{ github.sha }}
+          cp -r resources/public/* public/
+          cp -r target/public/* public/${{ github.sha }}
         # Adjust build paths for Github Pages
-      - run: sed -i 's|/cljs-out|cljs-out|g' target/public/${{ github.sha }}/cljs-out/asteroids-main.js
-      - run: sed -i 's|cljs-out|cljs-out//${{ github.sha }}|g' target/public/index.html
+      - run: sed -i 's|/cljs-out|cljs-out|g' public/${{ github.sha }}/cljs-out/asteroids-main.js
+      - run: sed -i 's|cljs-out|${{ github.sha }}/cljs-out/|g' public/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'target/public'
+          path: 'public'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
