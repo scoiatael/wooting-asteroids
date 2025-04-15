@@ -8,4 +8,4 @@
  :aliases {:build {:extra-deps {com.bhauman/figwheel-main {:mvn/version "0.2.20"}
                                 com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
                                 org.slf4j/slf4j-nop {:mvn/version "2.0.3"}}
-                   :main-opts ["-m" "figwheel.main" "-b" "flappy" "-r"]}}}
+                   :main-opts ["-m" "figwheel.main" "-b" "asteroids" "-r"]}}}

@@ -27,9 +27,9 @@ body {
   background: transparent url(../imgs/scrolling-border.png) repeat-x top left;
 }
 
-.flappy {
+.asteroids {
     position: absolute;
-    background: transparent url(../imgs/flappy-base.png) no-repeat top left;
+    background: transparent url(../imgs/asteroids-base.png) no-repeat top left;
     top: 312px;
     left: 212px;
     width: 57px;
