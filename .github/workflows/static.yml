@@ -47,8 +47,8 @@ jobs:
           cp -r resources/public/* public/
           cp -r target/public/* public/${{ github.sha }}
         # Adjust build paths for Github Pages
-      - run: sed -i 's|/cljs-out|cljs-out|g' public/${{ github.sha }}/cljs-out/asteroids-main.js
-      - run: sed -i 's|cljs-out|${{ github.sha }}/cljs-out/|g' public/index.html
+      - run: sed -i 's|/cljs-out|${{ github.sha }}/cljs-out|g' public/${{ github.sha }}/cljs-out/asteroids-main.js
+      - run: sed -i 's|cljs-out|${{ github.sha }}/cljs-out|g' public/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
