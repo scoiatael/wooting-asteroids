@@ -25,6 +25,9 @@
 (defn distance-from [player asteroid]
   (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)))
 
+(defn direction-from [player snitch]
+  [ (- (:cur-x player)  (:cur-x snitch)) (- (:cur-y player) (:cur-y snitch))])
+
 (defn- visible-from [player asteroid]
   (< (distance-from player asteroid) visible-distance))
 
@@ -61,8 +64,8 @@
     (assoc game :asteroids (apply conj asteroids new-asteroids))))
 
 (defn- spawn-snitch [{:keys [cur-time player asteroids] :as game}]
-  (let [seed (.floor js/Math (* 13 cur-time))
-        [x y] (random-point-on-circle seed player (mod seed 1200))]
+  (let [seed (.floor js/Math (* 7 cur-time))
+        [x y] (random-point-on-circle seed player (mod (+ seed 91) 1200))]
     (assoc game :snitch {:cur-x x
                          :cur-y y
                          :rotation 0
@@ -149,7 +152,7 @@
 
 (defn- has-collision [object player size]
   (let [radius (/ size 2)]
-    (> (- size 10) (distance-between (- (:cur-x object) radius) (- (:cur-y object) radius) (- (:cur-x player) 50) (- (:cur-y player) 50)))))
+    (> (- size 10 (/ radius 3)) (distance-between (- (:cur-x object) radius) (- (:cur-y object) radius) (:cur-x player) (:cur-y player)))))
 
 (defn- check-collisions [{:keys [player asteroids] :as game}]
   (if (some #(has-collision player % (asteroid-size (:variant %))) asteroids)
@@ -158,13 +161,13 @@
            :destroyed true)
     game))
 
-(def ^:private snitch-size 20)
+(def ^:private snitch-size 30)
 
 (defn- check-snitch-collision [{:keys [player snitch score] :as game}]
   (if (has-collision player snitch snitch-size)
-    (assoc game :score
-           (inc score)
-           :snitch nil)
+    (-> game (assoc :score (inc score)
+                    :snitch nil)
+        (spawn-snitch))
     game))
 
 (defn- alive [player asteroid]

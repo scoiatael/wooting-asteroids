@@ -34,6 +34,14 @@ body {
     height: 20px;
 }
 
+.snitch-tracker {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: transparent url(../imgs/snitch-tracker.svg) no-repeat top left;
+    scale: 1.2;
+}
+
 .ship {
     position: absolute;
     background: transparent url(../imgs/ship-base.svg) no-repeat top left;
