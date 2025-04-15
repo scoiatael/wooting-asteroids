@@ -17,7 +17,8 @@
                               (js->clj v :keywordize-keys true)
                               (map (fn [{:keys [scancode value]}] [(.scancodeToString js/analogsense scancode) value]) v)
                               (into {} v)
-                              (reset! keyboard-state v)))))
+                              (if (.hasFocus js/document)
+                                (reset! keyboard-state v))))))
 
 (defn start []
   (.then (initialize) handle-device))
