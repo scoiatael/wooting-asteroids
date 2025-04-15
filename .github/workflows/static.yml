@@ -44,7 +44,7 @@ jobs:
       - run: nix run . -- build
       - run: cp -r resources/public/* target/public/
         # Adjust build paths for Github Pages
-      - run: sed -i 's|/cljs-out|cljs-out|g' target/public/cljs-out/flappy-main.js
+      - run: sed -i 's|/cljs-out|cljs-out|g' target/public/cljs-out/asteroids-main.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
