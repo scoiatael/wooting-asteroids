@@ -42,6 +42,12 @@ body {
     left: 0px;
 }
 
+.ship-explosion {
+    position: absolute;
+    background: transparent url(../imgs/ship-explosion.svg) no-repeat top left;
+    width: 100px;
+    height: 100px;
+}
 
 .small-thrust {
     background: transparent url(../imgs/ship-thrust-small.svg) no-repeat top left;

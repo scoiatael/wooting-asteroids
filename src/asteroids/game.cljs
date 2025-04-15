@@ -14,6 +14,7 @@
 (def ^:private camera-offset-y (- (/ 640 2) 50))
 
 (def ^:private starting-state {:timer-running false
+                               :destroyed false
                                :player {:cur-x camera-offset-x
                                         :cur-y camera-offset-y
                                         :rotation 0
@@ -94,6 +95,21 @@
         py (- cur-y camera-offset-y)]
     (assoc game :camera {:ox px :oy py})))
 
+(defn- asteroid-size [variant]
+  (condp = variant
+    :big 100
+    50))
+
+(defn- has-collision [{:keys [variant] :as asteroid} player]
+  (> (asteroid-size variant) (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player))))
+
+(defn- check-collisions [{:keys [player asteroids] :as game}]
+  (if (some #(has-collision player %) asteroids)
+    (assoc game
+           :timer-running false
+           :destroyed true)
+    game))
+
 (defn- time-update [timestamp state]
   (-> state
       (assoc
@@ -101,6 +117,7 @@
        :time-delta (- timestamp (:cur-time state)))
       (update-rotation @device/keyboard-state)
       (update-vel @device/keyboard-state)
+      (check-collisions)
       (update-ship-position)
       (update-asteroids)
       (update-camera)))

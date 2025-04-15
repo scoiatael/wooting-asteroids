@@ -28,6 +28,9 @@
      [:div.ship-effect {:class (thrust-classes keyboard)}]
      [:div.ship-effect {:class (rotation-classes keyboard)}]])
 
+(defn- render-explosion [{:keys [cur-x cur-y rotation]}]
+    [:div.ship-explosion {:style {:top (px cur-y) :left (px cur-x)}}])
+
 (defn- render-asteroid [{:keys [id cur-x cur-y rotation variant] :as asteroid}]
   [:div.asteroid {:key id :class (str "asteroid-" (name variant)) :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
 
@@ -40,7 +43,7 @@
     [:div.asteroid-field
      (map #(->> % (translate-with-camera camera) render-asteroid) asteroids)])
 
-(defn- main-template [{:keys [timer-running camera player asteroids]} keyboard]
+(defn- main-template [{:keys [destroyed timer-running camera player asteroids]} keyboard]
   (sab/html [:div.board
              (when timer-running
                [:div.debug-hud
@@ -55,6 +58,8 @@
                (sab/html [:span]))
              (when timer-running
                (render-player (translate-with-camera camera player) keyboard))
+             (when destroyed
+               (render-explosion (translate-with-camera camera player)))
              (render-asteroids camera asteroids)]))
 
 (defn render [full-state keyboard]
