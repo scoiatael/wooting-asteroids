@@ -1,16 +1,23 @@
 <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-  <!-- Ship body - narrower version -->
+  <!-- Ship body -->
   <polygon
-    points="25,10 18,35 25,30 32,35"
+    points="25,10 10,35 25,30 40,35"
     fill="#5bf3ff"
     stroke="#ffffff"
     stroke-width="0.5" />
+
+  <!-- Thruster flame (when active) -->
+  <polygon
+    points="25,30 20,37 25,42 30,37"
+    fill="#ff6b00"
+    stroke="#ffcc00"
+    stroke-width="0.3" />
 
   <!-- Cockpit -->
   <circle
     cx="25"
     cy="22"
-    r="2.5"
+    r="3"
     fill="#003366"
     stroke="#ffffff"
     stroke-width="0.3" />
@@ -19,7 +26,7 @@
   <line
     x1="25"
     y1="25"
-    x2="20"
+    x2="15"
     y2="33"
     stroke="#ffffff"
     stroke-width="0.5" />
@@ -27,7 +34,7 @@
   <line
     x1="25"
     y1="25"
-    x2="30"
+    x2="35"
     y2="33"
     stroke="#ffffff"
     stroke-width="0.5" />

@@ -5,7 +5,7 @@
 (def ^:private acceleration 0.0001)
 
 (def ^:private starting-state {:timer-running false
-                               :player {:cur-x (- (/ 480 2) 50)
+                               :player {:cur-x (- (/ 640 2) 50)
                                         :cur-y (- (/ 640 2) 50)
                                         :rotation 0
                                         :vel-x 0
@@ -24,7 +24,7 @@
 
 (defn- added-rotation [device] (- (key-or device "D" 0) (key-or device "A" 0)))
 
-(defn- added-speed [device] (- (key-or device "S" 0) (key-or device "W" 0)))
+(defn added-speed [device] (- (key-or device "S" 0) (key-or device "W" 0)))
 
 (defn- update-rotation [{:keys [time-delta] :as game} device]
   (update-in game [:player :rotation] (fn [rotation]
@@ -45,11 +45,11 @@
 (defn update-ship-position [{:keys [time-delta] :as game}]
   (update-in game [:player] (fn [{:keys [vel-x vel-y cur-x cur-y] :as player}]
                                   (let [new-x (+ cur-x (* time-delta vel-x))
-                                        new-x (min new-x (- 480 100))
-                                        new-x (max new-x 0)
+                                        new-x (min new-x (- 640 50))
+                                        new-x (max new-x (- 0 50))
                                         new-y (+ cur-y (* time-delta vel-y))
-                                        new-y (min new-y (- 640 100))
-                                        new-y (max new-y 0)]
+                                        new-y (min new-y (- 640 50))
+                                        new-y (max new-y (- 0 50))]
                                     (assoc player
                                            :cur-x new-x
                                            :cur-y new-y)))))

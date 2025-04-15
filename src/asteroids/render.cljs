@@ -10,8 +10,12 @@
 
 (defn px [n] (str n "px"))
 
-(defn- render-player [{:keys [cur-x cur-y rotation]}]
-  [:div.ship {:style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
+(defn- render-player [{:keys [cur-x cur-y rotation]} keyboard]
+  (let [thrust (game/added-speed keyboard)
+        is-thrust-active (< 0.1 (.abs js/Math thrust))
+        is-forward-thrust (> 0 thrust)
+        class (if is-thrust-active (if is-forward-thrust "forward-thrust" "reverse-thrust") "")]
+    [:div.ship {:class class :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}]))
 
 (defn- main-template [{:keys [timer-running player]} keyboard]
   (sab/html [:div.board
@@ -23,7 +27,7 @@
                (sab/html [:a.start-button {:onClick #(do (device/start) (game/start))} "START"])
                (sab/html [:span]))
              (when timer-running
-               (render-player player))
+               (render-player player keyboard))
              ;; [:div (map pillar pillar-list)]
              ;; [:div.asteroids {:style {:top (px asteroids-y) :rotate (gstring/format "%.3fdeg" (- 0 (* rotate-angle cur-vel)))}}]
              ;; [:div.scrolling-border {:style { :background-position-x (px border-pos)}}]

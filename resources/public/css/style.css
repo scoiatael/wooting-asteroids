@@ -6,15 +6,15 @@ body {
 
 #board-area {
     position: relative;
-    width: 480px;
+    width: 640px;
     height: 640px;
     margin:0px auto;
-    background: rgb(112, 197, 206) url(../imgs/background.png) no-repeat left bottom;
+    background: rgb(112, 197, 206) url(../imgs/background.svg) no-repeat left bottom;
 }
 
 .board {
     position: relative;
-    width:480px;
+    width: 640px;
     height: 640px;
     overflow: hidden;
 }
@@ -32,6 +32,14 @@ body {
     background: transparent url(../imgs/ship-base.svg) no-repeat top left;
     width: 100px;
     height: 100px;
+}
+
+.forward-thrust {
+    background: transparent url(../imgs/ship-forward-thrust.svg) no-repeat top left;
+}
+
+.reverse-thrust {
+    background: transparent url(../imgs/ship-reverse-thrust.svg) no-repeat top left;
 }
 
 .pillar {
@@ -102,7 +110,7 @@ body {
     border-right: 3px solid rgb(84,56,71);
     padding: 1px 10px;
     top: 363px;
-    left: 128px;
+    left: 210px;
     text-align: center;
     width: 200px;
     text-shadow: -3px 0 black, 0 3px black, 3px 0 black, 0 -3px black;
