@@ -10,8 +10,8 @@
 
 (defn px [n] (str n "px"))
 
-(defn- render-player [{:keys [cur-x cur-y]}]
-  [:div.ship {:style {:top (px cur-y) :left (px cur-x)}}])
+(defn- render-player [{:keys [cur-x cur-y rotation]}]
+  [:div.ship {:style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
 
 (defn- main-template [{:keys [timer-running player]} keyboard]
   (sab/html [:div.board
