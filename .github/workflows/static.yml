@@ -42,9 +42,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - run: nix run . -- build
-      - run: cp -r resources/public/* target/public/
+      - run: |
+          mkdir -p target/public/${{ github.sha }}
+          cp -r resources/public/* target/public/${{ github.sha }}
         # Adjust build paths for Github Pages
-      - run: sed -i 's|/cljs-out|cljs-out|g' target/public/cljs-out/asteroids-main.js
+      - run: sed -i 's|/cljs-out|cljs-out|g' target/public/${{ github.sha }}/cljs-out/asteroids-main.js
+      - run: sed -i 's|cljs-out|cljs-out//${{ github.sha }}|g' target/public/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
