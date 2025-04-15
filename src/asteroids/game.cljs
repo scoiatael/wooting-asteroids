@@ -17,7 +17,7 @@
 
 (def ^:priate variants [:big :small-1 :small-2 :small-3 :small-4])
 
-(defn- distance-between [x1 y1 x2 y2]
+(defn distance-between [x1 y1 x2 y2]
   (let [dx (- x2 x1)
         dy (- y2 y1)]
     (Math/sqrt (+ (* dx dx) (* dy dy)))))

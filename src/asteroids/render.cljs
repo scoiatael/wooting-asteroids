@@ -38,8 +38,11 @@
 
 (defn- render-snitch-tracker [snitch {:keys [cur-x cur-y] :as player}]
   (let [[dx dy] (game/direction-from player snitch)
-        rotation (* -1 (.atan2 js/Math dx dy))]
-    [:div.snitch-tracker {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius)) :rotate (gstring/format "%.3frad" rotation)}}]))
+        rotation (* -1 (.atan2 js/Math dx dy))
+        distance (game/distance-between 0 dx 0 dy)]
+    (if (> distance 100)
+      [:div.snitch-tracker {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius)) :rotate (gstring/format "%.3frad" rotation)}}]
+      [:div])))
 
 (defn- render-asteroid [{:keys [id cur-x cur-y rotation variant] :as asteroid}]
   [:div.asteroid {:key id :class (str "asteroid-" (name variant)) :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
