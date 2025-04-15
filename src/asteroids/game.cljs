@@ -7,6 +7,9 @@
 (def ^:private initial-xs [128 467 600])
 (def ^:private initial-ys [53 128 400])
 
+(def ^:private initial-vx [-0.0001 0.0002 -0.0003])
+(def ^:private initial-vy [0.0001 -0.0004 -0.0001])
+
 (def ^:private starting-state {:timer-running false
                                :player {:cur-x (- (/ 640 2) 50)
                                         :cur-y (- (/ 640 2) 50)
@@ -19,9 +22,9 @@
                                                             :rotation (/ idx 4)
                                                             :id (str idx)
                                                             :variant variant
-                                                            :vel-rot 0.1
-                                                            :vel-x 0
-                                                            :vel-y 0})
+                                                            :vel-rot (* 0.00002 idx)
+                                                            :vel-x (get initial-vx (mod idx 3))
+                                                            :vel-y (get initial-vy (mod idx 3))})
                                                          [:big :small-1 :small-2 :small-3 :small-4])})
 
 (defonce state (atom starting-state))
@@ -67,6 +70,16 @@
                                            :cur-x new-x
                                            :cur-y new-y)))))
 
+(defn update-asteroids [{:keys [asteroids time-delta] :as game}]
+  (assoc-in game [:asteroids] (map  (fn [{:keys [vel-x vel-y vel-rot cur-x cur-y rotation] :as asteroid}]
+                                      (let [new-x (+ cur-x (* time-delta vel-x))
+                                            new-rotation (+ rotation (* time-delta vel-rot))
+                                            new-y (+ cur-y (* time-delta vel-y))]
+                                        (assoc asteroid
+                                               :rotation new-rotation
+                                               :cur-x new-x
+                                               :cur-y new-y))) asteroids)))
+
 (defn- time-update [timestamp state]
   (-> state
       (assoc
@@ -74,6 +87,7 @@
        :time-delta (- timestamp (:cur-time state)))
       (update-rotation @device/keyboard-state)
       (update-vel @device/keyboard-state)
+      (update-asteroids)
       (update-ship-position)))
 
 (defn- time-loop [time]
