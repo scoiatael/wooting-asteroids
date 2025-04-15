@@ -4,8 +4,6 @@
 (def ^:private rotation-speed 0.001)
 (def ^:private acceleration 0.0001)
 
-(def ^:private initial-pos [[64 100] [167 -30] [92 50] [53 -201] [128 128] [100 -100]
-                            [-53 123] [-267 30] [-231 50] [-53 -182] [-128 128] [200 100]])
 (def ^:private initial-vx [-0.0001 0.0002 -0.0003])
 (def ^:private initial-vy [0.0001 -0.0004 -0.0001])
 
@@ -24,19 +22,36 @@
         dy (- y2 y1)]
     (Math/sqrt (+ (* dx dx) (* dy dy)))))
 
-(defn- visible-from [player asteroid]
-  (< (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)) visible-distance))
 
-(defn- new-asteroid [cur-time {:keys [cur-x cur-y vel-x vel-y]} idx]
-  (let [seed (.floor js/Math (+ (* 10 cur-time ) idx))
+(defn- sgn [v] (if (> 0 v) -1 1))
+
+(defn- distance-from [player asteroid]
+  (distance-between (:cur-x asteroid) (:cur-y asteroid) (:cur-x player) (:cur-y player)))
+
+(defn- visible-from [player asteroid]
+  (< (distance-from player asteroid) visible-distance))
+
+(defn- random-point-on-circle [seed player radius]
+  (let [angle (rand (* 2 Math/PI))
+        x (+ (:cur-x player) (* radius (Math/cos angle)))
+        y (+ (:cur-y player) (* radius (Math/sin angle)))]
+    [x y]))
+
+(defn- new-asteroid [min-distance cur-time {:keys [cur-x cur-y vel-x vel-y] :as player} idx]
+  (let [seed (.floor js/Math (* 13 (+ cur-time idx)))
         seed3 (mod seed 3)
         seed4 (mod seed 4)
         seed5 (mod seed 5)
-        [x y] (get initial-pos (mod seed 12))]
-    {:cur-x (+ (* 2 vel-x) cur-x (* 3 x) (- (mod (mod seed 127319) 128) 64))
-     :cur-y (+ (* 2 vel-y) cur-y (* 3 y) (- (mod (mod seed 981721) 128) 64))
+        [x y] (random-point-on-circle seed player (mod seed 1200))
+        cur-x (+ x (- (mod (mod seed 127319) 128) 64))
+        cur-y (+ y (- (mod (mod seed 981721) 128) 64))
+        distance (distance-from player {:cur-x cur-x :cur-y cur-y})
+        [cur-x cur-y] (if (< distance min-distance) (random-point-on-circle seed player min-distance) [cur-x cur-y])]
+    {:cur-x cur-x
+     :cur-y cur-y
      :rotation (/ seed3 4)
      :id (str seed)
+     :distance distance
      :variant (get variants seed5)
      :vel-rot (* 0.00002 idx)
      :vel-x (+ (/ vel-x 20) (get initial-vx seed3))
@@ -45,8 +60,8 @@
 (defn- spawn-asteroids [{:keys [cur-time player asteroids] :as game}]
   (let [on-screen (count (filter #(visible-from player %) asteroids))
         target (- wanted-asteroids on-screen)
-        new-asteroids (map-indexed #(new-asteroid cur-time player %1) (repeat target {}))]
-    (when (seq new-asteroids) (prn new-asteroids))
+        new-asteroids (map-indexed #(new-asteroid (if (= 0 cur-time) 200 800) cur-time player %1) (repeat target {}))]
+    (when (seq new-asteroids) (prn  new-asteroids))
     (assoc game :asteroids (apply conj asteroids new-asteroids))))
 
 
@@ -125,7 +140,9 @@
     50))
 
 (defn- has-collision [{:keys [variant] :as asteroid} player]
-  (> (asteroid-size variant) (distance-between (:cur-x asteroid) (:cur-y asteroid) (- (:cur-x player) 50) (- (:cur-y player) 50))))
+  (let [size (asteroid-size variant)
+        radius (/ size 2)]
+    (> size (distance-between (- (:cur-x asteroid) radius) (- (:cur-y asteroid) radius) (- (:cur-x player) 50) (- (:cur-y player) 50)))))
 
 (defn- check-collisions [{:keys [player asteroids] :as game}]
   (if (some #(has-collision player %) asteroids)
