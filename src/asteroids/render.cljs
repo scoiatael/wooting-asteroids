@@ -31,6 +31,9 @@
 (defn- render-explosion [{:keys [cur-x cur-y]}]
     [:div.ship-explosion {:style {:top (px (- cur-y game/player-radius)) :left (px (- cur-x game/player-radius))}}])
 
+(defn- render-player-shield [{:keys [cur-x cur-y]}]
+    [:div.player-shield {:style {:top (px (- cur-y game/player-radius 5)) :left (px (- cur-x game/player-radius 5))}}])
+
 (defn- render-snitch [{:keys [cur-x cur-y rotation]}]
   [:div.snitch {:style {:top (px (- cur-y game/snitch-radius)) :left (px (- cur-x game/snitch-radius)) :rotate (gstring/format "%.3frad" rotation)}}])
 
@@ -58,7 +61,7 @@
   [:div.shield
    {:style {:height (px (* 240 shield))} :class (str (if shield-used "shield-used" ""))}])
 
-(defn- main-template [{:keys [destroyed score timer-running camera player asteroids snitch] :as game} keyboard]
+(defn- main-template [{:keys [destroyed score timer-running camera player asteroids snitch shield-used] :as game} keyboard]
   (sab/html [:div.board
              [:h1.score (gstring/format "%.1f" score)]
              (when timer-running
@@ -87,11 +90,13 @@
                (sab/html [:span]))
              (when timer-running
                (render-player (translate-with-camera camera player) keyboard))
+             (when true;; shield-used
+                 (render-player-shield (translate-with-camera camera player)))
              (when destroyed
                (render-explosion (translate-with-camera camera player)))
              (when snitch
                (render-snitch (translate-with-camera camera snitch)))
-             (when (and snitch timer-running)
+             (when true;; (and snitch timer-running)
                (render-snitch-tracker (translate-with-camera camera snitch) (translate-with-camera camera player)))
              (when timer-running
                (render-shield game))
