@@ -182,8 +182,8 @@
         ndx (/ dx distance)
         ndy (/ dy distance)]
     (condp = behaviour
-      :run-towards [rotation (* snitch-towards-speed ndx) (* snitch-towards-speed ndy)]
-      :run-away [rotation (* -1 ndx snitch-away-speed) (* -1 ndy snitch-away-speed)]
+      :run-towards [0 (* snitch-towards-speed ndx) (* snitch-towards-speed ndy)]
+      :run-away [0 (* -1 ndx snitch-away-speed) (* -1 ndy snitch-away-speed)]
       [0 0 0])))
 
 (defn- update-snitch [{:keys [snitch time-delta player] :as game}]
