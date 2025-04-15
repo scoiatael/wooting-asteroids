@@ -160,6 +160,10 @@ body {
   display: flex;
 }
 
+.debug-hud > * {
+  flex: min-content 100px;
+}
+
 .debug {
     color: rgb(244,176,36);
     font-size: 10px;
