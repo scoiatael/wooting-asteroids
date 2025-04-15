@@ -22,7 +22,7 @@
 (defn- key-or [device k o]
   (or (device k) o))
 
-(defn- added-rotation [device] (- (key-or device "D" 0) (key-or device "A" 0)))
+(defn added-rotation [device] (- (key-or device "D" 0) (key-or device "A" 0)))
 
 (defn added-speed [device] (- (key-or device "S" 0) (key-or device "W" 0)))
 

@@ -14,7 +14,13 @@
   (let [thrust (game/added-speed keyboard)
         is-thrust-active (< 0.1 (.abs js/Math thrust))
         is-forward-thrust (> 0 thrust)
-        class (if is-thrust-active (if is-forward-thrust "forward-thrust" "reverse-thrust") "")]
+        extra-rotation (game/added-rotation keyboard)
+        is-rotation-active (< 0.1 (.abs js/Math extra-rotation))
+        is-left-rotation (< 0 extra-rotation)
+
+        class ""
+        class (str class " " (if is-thrust-active (if is-forward-thrust "forward-thrust" "reverse-thrust") ""))
+        class (str class " " (if is-rotation-active (if is-left-rotation "left-thrust" "right-thrust")))]
     [:div.ship {:class class :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}]))
 
 (defn- main-template [{:keys [timer-running player]} keyboard]

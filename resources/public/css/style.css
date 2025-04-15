@@ -42,6 +42,14 @@ body {
     background: transparent url(../imgs/ship-reverse-thrust.svg) no-repeat top left;
 }
 
+.left-thrust {
+    background: transparent url(../imgs/ship-left-thrust.svg) no-repeat top left;
+}
+
+.right-thrust {
+    background: transparent url(../imgs/ship-right-thrust.svg) no-repeat top left;
+}
+
 .pillar {
   position: absolute;
   width: 86px;
