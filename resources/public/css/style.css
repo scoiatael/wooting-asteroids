@@ -164,6 +164,19 @@ body {
   flex: min-content 100px;
 }
 
+.shield {
+  position: absolute;
+  bottom: 200px;
+  right: 10px;
+  background-color: blue;
+  height: 240px;
+  width: 10px;
+}
+
+.shield-used {
+  border: thick double #32a1ce;
+}
+
 .debug {
     color: rgb(244,176,36);
     font-size: 10px;

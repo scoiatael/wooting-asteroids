@@ -3,6 +3,11 @@
 
 (def ^:private rotation-speed 0.001)
 (def ^:private acceleration 0.0001)
+(def ^:private shield-decay 0.0001)
+
+(def player-radius 50)
+(def snitch-radius 10)
+
 
 (def ^:private snitch-towards-speed 0.02)
 (def ^:private snitch-away-speed 0.06)
@@ -82,6 +87,8 @@
                                    :score 0
                                    :destroyed false
                                    :snitch nil
+                                   :shield 0
+                                   :shield-being-used false
                                    :player {:cur-x camera-offset-x
                                             :cur-y camera-offset-y
                                             :rotation 0
@@ -125,13 +132,22 @@
                                        :vel-x new-x
                                        :vel-y new-y)))))
 
+(defn- update-shield [{:keys [time-delta shield score] :as game} keyboard]
+  (let [used (get keyboard "Space")
+        can-use (> shield 0)
+        used (and used can-use)]
+    (assoc game
+           :shield-used used
+           :score (if used (max 0 (- score (* shield-decay time-delta))) score)
+           :shield (if used (max 0 (- shield (* shield-decay time-delta))) shield))))
+
 (defn- update-ship-position [{:keys [time-delta] :as game}]
   (update-in game [:player] (fn [{:keys [vel-x vel-y cur-x cur-y] :as player}]
-                                  (let [new-x (+ cur-x (* time-delta vel-x))
-                                        new-y (+ cur-y (* time-delta vel-y))]
-                                    (assoc player
-                                           :cur-x new-x
-                                           :cur-y new-y)))))
+                              (let [new-x (+ cur-x (* time-delta vel-x))
+                                    new-y (+ cur-y (* time-delta vel-y))]
+                                (assoc player
+                                       :cur-x new-x
+                                       :cur-y new-y)))))
 
 (defn- update-asteroids [{:keys [asteroids time-delta] :as game}]
   (assoc-in game [:asteroids] (map  (fn [{:keys [vel-x vel-y vel-rot cur-x cur-y rotation] :as asteroid}]
@@ -156,15 +172,18 @@
     :big 100
     50))
 
-(defn- has-collision [object player size]
+(defn- has-collision [player asteroid size]
   (let [radius (/ size 2)]
-    (> (- size 10 (/ radius 3)) (distance-between (- (:cur-x object) radius) (- (:cur-y object) radius) (:cur-x player) (:cur-y player)))))
+    (when (> (- size 10 (/ radius 3)) (distance-between (- (:cur-x player) radius) (- (:cur-y player) radius) (:cur-x asteroid) (:cur-y asteroid)))
+      asteroid)))
 
-(defn- check-collisions [{:keys [player asteroids] :as game}]
-  (if (some #(has-collision player % (asteroid-size (:variant %))) asteroids)
-    (assoc game
-           :timer-running false
-           :destroyed true)
+(defn- check-collisions [{:keys [player asteroids shield-used] :as game}]
+  (if-let [{:keys [id]} (some #(has-collision player % (asteroid-size (:variant %))) asteroids)]
+    (if shield-used
+      (assoc game :asteroids (filter #(not (= id (:id %))) asteroids))
+      (assoc game
+             :timer-running false
+             :destroyed true))
     game))
 
 (def ^:private snitch-size 30)
@@ -215,6 +234,7 @@
        :time-delta (- timestamp (:cur-time state)))
       (update-rotation @device/keyboard-state)
       (update-vel @device/keyboard-state)
+      (update-shield @device/keyboard-state)
       (check-collisions)
       (update-ship-position)
       (update-asteroids)
@@ -235,3 +255,9 @@
    (fn [time]
      (reset! state (fresh-state @state time))
      (time-loop time))))
+
+
+(add-watch state :shield-booster (fn [_ _ old {:keys [score] :as new}] (when (and  (< (:score old)
+                                                                                      score)
+                                                                                   (>= score 1))
+                                                                         (reset! state (assoc new :shield 1)))))

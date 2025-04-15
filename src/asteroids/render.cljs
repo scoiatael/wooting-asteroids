@@ -23,30 +23,27 @@
   (let [rotation (game/added-rotation keyboard)]
    (str (display-magnitude rotation) " " (sgn rotation "left-thrust" "right-thrust"))))
 
-(def ^:private player-radius 50)
-(def ^:private snitch-radius 10)
-
 (defn- render-player [{:keys [cur-x cur-y rotation]} keyboard]
-  [:div.ship {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius)) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}
+  [:div.ship {:style {:top (px (- cur-y game/player-radius)) :left (px (- cur-x game/player-radius)) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}
    [:div.ship-effect {:class (thrust-classes keyboard)}]
    [:div.ship-effect {:class (rotation-classes keyboard)}]])
 
 (defn- render-explosion [{:keys [cur-x cur-y]}]
-    [:div.ship-explosion {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius))}}])
+    [:div.ship-explosion {:style {:top (px (- cur-y game/player-radius)) :left (px (- cur-x game/player-radius))}}])
 
 (defn- render-snitch [{:keys [cur-x cur-y rotation]}]
-  [:div.snitch {:style {:top (px (- cur-y snitch-radius)) :left (px (- cur-x snitch-radius)) :rotate (gstring/format "%.3frad" rotation)}}])
+  [:div.snitch {:style {:top (px (- cur-y game/snitch-radius)) :left (px (- cur-x game/snitch-radius)) :rotate (gstring/format "%.3frad" rotation)}}])
 
 (defn- render-snitch-tracker [snitch {:keys [cur-x cur-y] :as player}]
   (let [[dx dy] (game/direction-from player snitch)
         rotation (* -1 (.atan2 js/Math dx dy))
         distance (game/distance-from player snitch)]
     (if (> distance 100)
-      [:div.snitch-tracker {:style {:top (px (- cur-y player-radius)) :left (px (- cur-x player-radius)) :rotate (gstring/format "%.3frad" rotation)}}]
+      [:div.snitch-tracker {:style {:top (px (- cur-y game/player-radius)) :left (px (- cur-x game/player-radius)) :rotate (gstring/format "%.3frad" rotation)}}]
       [:div])))
 
 (defn- render-asteroid [{:keys [id cur-x cur-y rotation variant] :as asteroid}]
-  [:div.asteroid {:key id :class (str "asteroid-" (name variant)) :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
+  [:div.asteroid {:key id :id id :class (str "asteroid-" (name variant)) :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
 
 (defn- translate-with-camera [{:keys [ox oy]} {:keys [cur-x cur-y] :as item}]
   (assoc item
@@ -57,13 +54,18 @@
     [:div.asteroid-field
      (map #(->> % (translate-with-camera camera) render-asteroid) asteroids)])
 
-(defn- main-template [{:keys [destroyed score timer-running camera player asteroids snitch]} keyboard]
+(defn- render-shield [{:keys [shield shield-used]}]
+  [:div.shield
+   {:style {:height (px (* 240 shield))} :class (str (if shield-used "shield-used" ""))}])
+
+(defn- main-template [{:keys [destroyed score timer-running camera player asteroids snitch] :as game} keyboard]
   (sab/html [:div.board
-             [:h1.score score]
+             [:h1.score (gstring/format "%.1f" score)]
              (when timer-running
                [:div.debug-hud
                 [:div
                  [:h4.debug "asteroids: " (count asteroids)]
+                 [:h4.debug "shield: " (:shield game)]
                  (when snitch [:h4.debug (gstring/format "distance: %.3f" (game/distance-from player snitch))])]
                 [:div
                  [:h4.debug "keyboard"]
@@ -89,8 +91,10 @@
                (render-explosion (translate-with-camera camera player)))
              (when snitch
                (render-snitch (translate-with-camera camera snitch)))
-             (when (and  snitch timer-running)
+             (when (and snitch timer-running)
                (render-snitch-tracker (translate-with-camera camera snitch) (translate-with-camera camera player)))
+             (when timer-running
+               (render-shield game))
              (render-asteroids camera asteroids)]))
 
 (defn render [full-state keyboard]
