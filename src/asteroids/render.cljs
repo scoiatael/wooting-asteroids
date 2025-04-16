@@ -41,9 +41,10 @@
   (let [[dx dy] (game/direction-from player snitch)
         rotation (* -1 (.atan2 js/Math dx dy))
         distance (game/distance-from player snitch)
+        opacity (max 0.1 (- 1 (/ distance 1000)))
         scale (+ 1.2 (/ distance 1000))]
     (if (> distance 100)
-      [:div.snitch-tracker {:style {:transform (str "scale(" scale ")") :top (px (- cur-y game/player-radius)) :left (px (- cur-x game/player-radius)) :rotate (gstring/format "%.3frad" rotation)}}]
+      [:div.snitch-tracker {:style {:filter (str "opacity(" opacity ")") :transform (str "scale(" scale ")") :top (px (- cur-y game/player-radius)) :left (px (- cur-x game/player-radius)) :rotate (gstring/format "%.3frad" rotation)}}]
       [:div])))
 
 (defn- render-debris [{:keys [id cur-x cur-y rotation variant lifetime] :as debris}]
