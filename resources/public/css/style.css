@@ -247,6 +247,41 @@ body {
     height: 50px;
 }
 
+.debris-big {
+    position: absolute;
+    background: transparent url(../imgs/debris-big.svg) no-repeat top left;
+    width: 100px;
+    height: 100px;
+}
+
+.debris-small-1 {
+    background: transparent url(../imgs/debris-small-1.svg) no-repeat top left;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+.debris-small-2 {
+    background: transparent url(../imgs/debris-small-2.svg) no-repeat top left;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+.debris-small-3 {
+    background: transparent url(../imgs/debris-small-3.svg) no-repeat top left;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+.debris-small-4 {
+    background: transparent url(../imgs/debris-small-4.svg) no-repeat top left;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
 @media (max-width: 480px){
     body {
         margin: 0px;

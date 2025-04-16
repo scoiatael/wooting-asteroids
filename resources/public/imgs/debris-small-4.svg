@@ -1,0 +1,13 @@
+<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+  <g fill="#888">
+    <polygon points="5,5 8,3 7,7"/>
+    <polygon points="12,8 14,10 10,11"/>
+    <polygon points="20,6 22,8 21,10 19,9"/>
+    <polygon points="25,15 27,16 26,18"/>
+    <polygon points="18,20 21,19 20,22"/>
+    <polygon points="10,18 12,20 9,21"/>
+    <polygon points="4,22 6,25 3,25"/>
+    <polygon points="15,25 17,28 14,27"/>
+    <polygon points="23,23 24,25 22,26"/>
+  </g>
+</svg>

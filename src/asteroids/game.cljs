@@ -14,6 +14,7 @@
 (def ^:private snitch-attraction-radius 70)
 (def ^:private snitch-ignore-radius 200)
 (def ^:private snitch-repelling-radius 800)
+(def debris-lifetime 1000)
 
 (def ^:private initial-vx [-0.0001 0.0002 -0.0003])
 (def ^:private initial-vy [0.0001 -0.0004 -0.0001])
@@ -97,6 +98,7 @@
                                    :camera {:ox 0
                                             :oy 0}
                                    :cur-time 0
+                                   :debris []
                                    :asteroids []}
                                   spawn-snitch
                                   spawn-asteroids))
@@ -159,6 +161,16 @@
                                                :cur-x new-x
                                                :cur-y new-y))) asteroids)))
 
+(defn- update-debris-field [{:keys [debris time-delta] :as game}]
+  (assoc-in game [:debris] (map  (fn [{:keys [vel-x vel-y vel-rot cur-x cur-y rotation lifetime] :as rock}]
+                                      (let [new-x (+ cur-x (* time-delta vel-x))
+                                            new-rotation (+ rotation (* time-delta vel-rot))
+                                            new-y (+ cur-y (* time-delta vel-y))]
+                                        (assoc rock
+                                               :lifetime (- lifetime time-delta)
+                                               :rotation new-rotation
+                                               :cur-x new-x
+                                               :cur-y new-y))) debris)))
 
 (defn- update-camera [{:keys [time-delta camera player] :as game}]
   (let [{:keys [cur-x cur-y]} player
@@ -177,10 +189,11 @@
     (when (> (- size 10 (/ radius 3)) (distance-between (- (:cur-x player) radius) (- (:cur-y player) radius) (:cur-x asteroid) (:cur-y asteroid)))
       asteroid)))
 
-(defn- check-collisions [{:keys [player asteroids shield-used] :as game}]
-  (if-let [{:keys [id]} (some #(has-collision player % (asteroid-size (:variant %))) asteroids)]
+(defn- check-collisions [{:keys [debris player asteroids shield-used] :as game}]
+  (if-let [{:keys [id] :as asteroid} (some #(has-collision player % (asteroid-size (:variant %))) asteroids)]
     (if shield-used
-      (assoc game :asteroids (filter #(not (= id (:id %))) asteroids))
+      (assoc game :asteroids (filter #(not (= id (:id %))) asteroids)
+             :debris (conj debris (assoc asteroid :lifetime debris-lifetime)))
       (assoc game
              :timer-running false
              :destroyed true))
@@ -227,6 +240,9 @@
 (defn- prune-asteroids [{:keys [player asteroids] :as game}]
   (assoc game :asteroids (filter #(not (alive player %)) asteroids)))
 
+(defn- prune-debris [{:keys [debris] :as game}]
+  (assoc game :debris (filter #(> 0 (:lifetime %)) debris)))
+
 (defn- time-update [timestamp state]
   (-> state
       (assoc
@@ -238,6 +254,7 @@
       (check-collisions)
       (update-ship-position)
       (update-asteroids)
+      (update-debris-field)
       (update-camera)
       (prune-asteroids)
       (spawn-asteroids)

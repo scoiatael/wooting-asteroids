@@ -1,0 +1,13 @@
+<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+  <!-- Small asteroid fragments -->
+  <polygon points="5,10 8,8 10,12 7,14" fill="#a67c52"/>
+  <polygon points="20,5 23,7 21,10 18,9" fill="#8c6b4a"/>
+  <polygon points="15,20 18,18 20,21 16,22" fill="#a67c52"/>
+  <polygon points="10,25 12,23 13,26 9,27" fill="#8c6b4a"/>
+  <polygon points="22,18 25,16 26,19 24,21" fill="#a67c52"/>
+  <polygon points="4,21 6,19 8,22 5,23" fill="#8c6b4a"/>
+  <circle cx="23" cy="25" r="1.5" fill="#a67c52"/>
+  <circle cx="7" cy="5" r="1" fill="#8c6b4a"/>
+  <circle cx="15" cy="11" r="1.2" fill="#a67c52"/>
+  <circle cx="26" cy="12" r="0.8" fill="#8c6b4a"/>
+</svg>

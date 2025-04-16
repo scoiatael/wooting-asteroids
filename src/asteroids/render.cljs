@@ -45,6 +45,9 @@
       [:div.snitch-tracker {:style {:top (px (- cur-y game/player-radius)) :left (px (- cur-x game/player-radius)) :rotate (gstring/format "%.3frad" rotation)}}]
       [:div])))
 
+(defn- render-debris [{:keys [id cur-x cur-y rotation variant lifetime] :as debris}]
+  [:div.debris {:key id :id id :class (str "debris-" (name variant)) :style {:opacity (/ lifetime game/debris-lifetime ) :top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
+
 (defn- render-asteroid [{:keys [id cur-x cur-y rotation variant] :as asteroid}]
   [:div.asteroid {:key id :id id :class (str "asteroid-" (name variant)) :style {:top (px cur-y) :left (px cur-x) :rotate (gstring/format "%.3fdeg" (* 180 rotation))}}])
 
@@ -57,11 +60,15 @@
     [:div.asteroid-field
      (map #(->> % (translate-with-camera camera) render-asteroid) asteroids)])
 
+(defn- render-debris-field [camera debris]
+    [:div.debris-field
+     (map #(->> % (translate-with-camera camera) render-debris) debris)])
+
 (defn- render-shield [{:keys [shield shield-used]}]
   [:div.shield
    {:style {:height (px (* 240 shield))} :class (str (if shield-used "shield-used" ""))}])
 
-(defn- main-template [{:keys [destroyed score timer-running camera player asteroids snitch shield-used] :as game} keyboard]
+(defn- main-template [{:keys [debris destroyed score timer-running camera player asteroids snitch shield-used] :as game} keyboard]
   (sab/html [:div.board
              [:h1.score (gstring/format "%.1f" score)]
              (when timer-running
@@ -91,7 +98,7 @@
              (when timer-running
                (render-player (translate-with-camera camera player) keyboard))
              (when shield-used
-                 (render-player-shield (translate-with-camera camera player)))
+               (render-player-shield (translate-with-camera camera player)))
              (when destroyed
                (render-explosion (translate-with-camera camera player)))
              (when snitch
@@ -100,7 +107,8 @@
                (render-snitch-tracker (translate-with-camera camera snitch) (translate-with-camera camera player)))
              (when timer-running
                (render-shield game))
-             (render-asteroids camera asteroids)]))
+             (render-asteroids camera asteroids)
+             (render-debris-field camera debris)]))
 
 (defn render [full-state keyboard]
   (.render root (main-template full-state keyboard)))
