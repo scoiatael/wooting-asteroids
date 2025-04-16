@@ -7,6 +7,7 @@
 
 (def player-radius 50)
 (def snitch-radius 10)
+(def snitch-vel-rot 0.1)
 
 
 (def ^:private snitch-towards-speed 0.02)
@@ -220,17 +221,16 @@
 
 (defn- update-snitch [{:keys [snitch time-delta player] :as game}]
   (let [[dx dy] (direction-from player snitch)
-        rotation (* -1 (.atan2 js/Math dx dy))
         distance (distance-from player snitch)
         behaviour (condp > distance snitch-attraction-radius :run-towards snitch-ignore-radius :do-nothing snitch-repelling-radius :run-away :do-nothing)
-        [rotation vx vy] (apply-snitch-behaviour behaviour [distance dx dy] snitch)]
+        [_ vx vy] (apply-snitch-behaviour behaviour [distance dx dy] snitch)]
     (update-in game [:snitch]
-               (fn [{:keys [cur-x cur-y vel-x vel-y]}]
+               (fn [{:keys [cur-x cur-y vel-x vel-y rotation]}]
                  (assoc snitch
                         :behaviour behaviour
                         :cur-x (+ cur-x (* time-delta vel-x))
                         :cur-y (+ cur-y (* time-delta vel-y))
-                        :rotation rotation
+                        :rotation (+ rotation snitch-vel-rot)
                         :vel-x vx
                         :vel-y vy)))))
 
