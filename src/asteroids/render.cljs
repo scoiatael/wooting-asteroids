@@ -68,7 +68,7 @@
                [:div.debug-hud
                 [:div
                  [:h4.debug "asteroids: " (count asteroids)]
-                 [:h4.debug "shield: " (:shield game)]
+                 [:h4.debug (gstring/format  "shield: %.3f " (:shield game))]
                  (when snitch [:h4.debug (gstring/format "distance: %.3f" (game/distance-from player snitch))])]
                 [:div
                  [:h4.debug "keyboard"]
